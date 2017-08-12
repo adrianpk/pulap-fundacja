@@ -1,0 +1,50 @@
+# Copyright (c) 2017 Kuguar <licenses@kuguar.io> Author: Adrian P.K. <apk@kuguar.io>
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-
+  id: e82ae81a-aadf-43ff-990f-2d28689f0384
+  name: Plan1 subscrtiption
+  description: Plan1 subscription description.
+  started_at: 2017-01-01 12:00:00
+  ends_at: 2018-01-01 12:00:00
+  user_id: 5958b185-8150-4aae-b53f-0c44771ddec5
+  plan_id: 50273641-8fa0-4275-af3c-a7d2e3025c61
+  created_by: 5958b185-8150-4aae-b53f-0c44771ddec5
+  is_active: true
+  is_logical_deleted: false
+  created_at: 2017-01-01 12:00:00
+  updated_at: 2017-01-01 12:00:00
+
+-
+  id: 05da878c-03bb-4d55-8cae-2c5bd149def9
+  name: Plan2 subscription
+  description: Plan2 subscription description
+  started_at: 2017-01-01 12:00:00
+  ends_at: 2018-01-01 12:00:00
+  user_id: 3c05e701-b495-4443-b454-2c37e2ecccdf
+  plan_id: 51dbccff-7503-462a-b92e-ed4b852b6bab
+  created_by: 3c05e701-b495-4443-b454-2c37e2ecccdf
+  is_active: true
+  is_logical_deleted: false
+  created_at: 2017-01-01 12:00:00
+  updated_at: 2017-01-01 12:00:00

@@ -1,0 +1,47 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+fundacja
+gin-bin
+grs.sh
+
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
+.glide/
+
+# Testing
+models/sample.go
+controllers/sample.go
+repo/sample.go
+routers/sample.go
+tests/sample_test.go
+resource/migrations/0_samples_up.sqls
+resource/migrations/0_samples_down.sql
+resource/fixtures/sample.yml
+
+# More
+resources/keys/fundacja.rsa
+resources/keys/fundacja.rsa.pub
+config/config_dev.json
+config/config_test.json
+config/config_prod.json
+public
+client
+client/rest
+logs/logs.txt
+tmp
+debug
+
+# Misc
+.DS_Store
+.tags
+.tags1
+resources/.DS_Store

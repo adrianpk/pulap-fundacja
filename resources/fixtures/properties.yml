@@ -1,0 +1,60 @@
+# Copyright (c) 2017 Kuguar <licenses@kuguar.io> Author: Adrian P.K. <apk@kuguar.io>
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-
+  id: a3066a59-5e2e-4305-9844-d9e2c2317924
+  name: Property1
+  description: Property1 description.
+  string_value: "Property1-Value"
+  int_value:
+  float_value:
+  boolean_value:
+  timestamp_value:
+  geolocation_value:
+  value_type: "s"
+  position: 0
+  properties_set_id: b2672e94-e1ba-4c23-a428-b91528d06d1f
+  created_by: 5958b185-8150-4aae-b53f-0c44771ddec5
+  is_active: true
+  is_logical_deleted: false
+  created_at: 2017-01-01 12:00:00
+  updated_at: 2017-01-01 12:00:00
+
+-
+  id: 8b348adf-01b9-45d1-8d11-e9d4e0090e20
+  name: Property2
+  description: Property2 description.
+  string_value:
+  int_value: "255"
+  float_value:
+  boolean_value:
+  timestamp_value:
+  geolocation_value:
+  value_type: "i"
+  position: 0
+  properties_set_id: b2672e94-e1ba-4c23-a428-b91528d06d1f
+  created_by: 5958b185-8150-4aae-b53f-0c44771ddec5
+  is_active: true
+  is_logical_deleted: false
+  created_at: 2017-01-01 12:00:00
+  updated_at: 2017-01-01 12:00:00

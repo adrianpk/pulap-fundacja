@@ -1,0 +1,10 @@
+{
+  "Server"  : "0.0.0.0:8080",
+  "DBHost"  : "127.0.0.1",
+  "Database": "dbname-dev",
+  "DBUser"  : "dbuser",
+  "DBPass"	: "dbpass",
+  "DBSSL"   : "disable",
+  "LogLevel": 1,
+  "LogFile" : "/tmp/logs.txt"
+}

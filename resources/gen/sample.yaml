@@ -1,0 +1,32 @@
+---
+  name: sample
+  #plural: lolas
+  propertyDefs:
+    - name: ID
+      type: primary_key
+      length: 36
+      isKey: true
+      isUnique: true
+    - name: Name
+      type: string
+      length: 36
+      isKey: false
+      isUnique: true
+    - name: Description
+      type: text
+      length: 36
+      isKey: false
+      isUnique: false
+    - name: UserID
+      type: string
+      length: 36
+      isKey: false
+      isUnique: false
+      references:
+        model: user
+        #table: users
+        property: ID
+  implements:
+    - annotable: true
+    - geolocalizable: true
+    - auditable: true
