@@ -24,7 +24,7 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/gorilla/mux"
 )
@@ -36,10 +36,10 @@ func InitAPIPlanRouter() *mux.Router {
 	// Router
 	planRouter := apiV1Router.PathPrefix(plansPath).Subrouter()
 	// Plan resource
-	planRouter.HandleFunc("", controllers.GetPlans).Methods("GET")
-	planRouter.HandleFunc("", controllers.CreatePlan).Methods("POST")
-	planRouter.HandleFunc("/{plan}", controllers.GetPlan).Methods("GET")
-	planRouter.HandleFunc("/{plan}", controllers.UpdatePlan).Methods("PUT")
-	planRouter.HandleFunc("/{plan}", controllers.DeletePlan).Methods("DELETE")
+	planRouter.HandleFunc("", api.GetPlans).Methods("GET")
+	planRouter.HandleFunc("", api.CreatePlan).Methods("POST")
+	planRouter.HandleFunc("/{plan}", api.GetPlan).Methods("GET")
+	planRouter.HandleFunc("/{plan}", api.UpdatePlan).Methods("PUT")
+	planRouter.HandleFunc("/{plan}", api.DeletePlan).Methods("DELETE")
 	return planRouter
 }

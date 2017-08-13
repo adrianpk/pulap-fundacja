@@ -24,7 +24,7 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/gorilla/mux"
 )
@@ -36,10 +36,10 @@ func InitAPIPropertyRouter() *mux.Router {
 	// Router
 	propertyRouter := apiV1Router.PathPrefix(propertiesPath).Subrouter()
 	// Resource
-	propertyRouter.HandleFunc("", controllers.GetProperties).Methods("GET")
-	propertyRouter.HandleFunc("", controllers.CreateProperty).Methods("POST")
-	propertyRouter.HandleFunc("/{property}", controllers.GetProperty).Methods("GET")
-	propertyRouter.HandleFunc("/{property}", controllers.UpdateProperty).Methods("PUT")
-	propertyRouter.HandleFunc("/{property}", controllers.DeleteProperty).Methods("DELETE")
+	propertyRouter.HandleFunc("", api.GetProperties).Methods("GET")
+	propertyRouter.HandleFunc("", api.CreateProperty).Methods("POST")
+	propertyRouter.HandleFunc("/{property}", api.GetProperty).Methods("GET")
+	propertyRouter.HandleFunc("/{property}", api.UpdateProperty).Methods("PUT")
+	propertyRouter.HandleFunc("/{property}", api.DeleteProperty).Methods("DELETE")
 	return propertyRouter
 }

@@ -21,18 +21,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package routers
+package api
 
-// InitAPIProfileRouter - Initialize API router for profiles.
-// func InitAPIProfileRouter(parentRouter *mux.Router) *mux.Router {
-// 	// // Paths
-// 	// profilePath := "/api/v1/users/{user}/profile"
-// 	// // Router
-// 	// profileRouter := parentRouter.PathPrefix(profilePath).Subrouter()
-// 	// // // Resource
-// 	// profileRouter.HandleFunc("", api.GetUserProfile).Methods("GET")
-// 	// profileRouter.HandleFunc("", api.CreateUserProfile).Methods("POST")
-// 	// profileRouter.HandleFunc("", api.UpdateUserProfile).Methods("PUT")
-// 	// profileRouter.HandleFunc("", api.DeleteUserProfile).Methods("DELETE")
-// 	// return profileRouter
-// }
+import (
+	"strconv"
+)
+
+func isNum(v string) bool {
+	_, err := strconv.ParseInt(v, 10, 64)
+	return (err == nil)
+}

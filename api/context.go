@@ -21,18 +21,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package routers
+package api
 
-// InitAPIProfileRouter - Initialize API router for profiles.
-// func InitAPIProfileRouter(parentRouter *mux.Router) *mux.Router {
-// 	// // Paths
-// 	// profilePath := "/api/v1/users/{user}/profile"
-// 	// // Router
-// 	// profileRouter := parentRouter.PathPrefix(profilePath).Subrouter()
-// 	// // // Resource
-// 	// profileRouter.HandleFunc("", api.GetUserProfile).Methods("GET")
-// 	// profileRouter.HandleFunc("", api.CreateUserProfile).Methods("POST")
-// 	// profileRouter.HandleFunc("", api.UpdateUserProfile).Methods("PUT")
-// 	// profileRouter.HandleFunc("", api.DeleteUserProfile).Methods("DELETE")
-// 	// return profileRouter
-// }
+import (
+	"github.com/adrianpk/fundacja/bootstrap"
+
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+)
+
+// Context used for maintaining HTTP Request Context
+type Context struct {
+	MongoSession *mgo.Session
+	User         string
+	UserID       bson.ObjectId
+}
+
+// Close mgo.Session
+func (c *Context) Close() {
+	c.MongoSession.Close()
+}
+
+// DbCollection returns mgo.collection for the given name
+func (c *Context) DbCollection(name string) *mgo.Collection {
+	return c.MongoSession.DB(bootstrap.AppConfig.Database).C(name)
+}
+
+// NewContext creates a new Context object for each HTTP request
+func NewContext() *Context {
+	session := bootstrap.GetSession().Copy()
+	context := &Context{
+		MongoSession: session,
+	}
+	return context
+}

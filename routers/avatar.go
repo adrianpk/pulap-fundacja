@@ -25,7 +25,7 @@ package routers
 
 import (
 	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -38,7 +38,7 @@ func InitAPIAvatarRouter() *mux.Router {
 	// Router
 	avatarRouter := apiV1Router.PathPrefix(avatarPath).Subrouter()
 	// Resource
-	avatarRouter.HandleFunc("", controllers.HandleAvatar)
+	avatarRouter.HandleFunc("", api.HandleAvatar)
 	// Middleware
 	apiV1Router.Handle(avatarPath, negroni.New(
 		negroni.HandlerFunc(bootstrap.Authorize),

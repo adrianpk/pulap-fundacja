@@ -24,7 +24,7 @@ package routers
 
 import (
 	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -37,11 +37,11 @@ func InitAPIPermissionRouter() *mux.Router {
 	// Router
 	permissionRouter := apiV1Router.PathPrefix(permissionsPath).Subrouter()
 	// Resource
-	permissionRouter.HandleFunc("", controllers.GetPermissions).Methods("GET")
-	permissionRouter.HandleFunc("", controllers.CreatePermission).Methods("POST")
-	permissionRouter.HandleFunc("/{permission}", controllers.GetPermission).Methods("GET")
-	permissionRouter.HandleFunc("/{permission}", controllers.UpdatePermission).Methods("PUT")
-	permissionRouter.HandleFunc("/{permission}", controllers.DeletePermission).Methods("DELETE")
+	permissionRouter.HandleFunc("", api.GetPermissions).Methods("GET")
+	permissionRouter.HandleFunc("", api.CreatePermission).Methods("POST")
+	permissionRouter.HandleFunc("/{permission}", api.GetPermission).Methods("GET")
+	permissionRouter.HandleFunc("/{permission}", api.UpdatePermission).Methods("PUT")
+	permissionRouter.HandleFunc("/{permission}", api.DeletePermission).Methods("DELETE")
 	// Middleware
 	apiV1Router.Handle(permissionsPath, negroni.New(
 		negroni.HandlerFunc(bootstrap.Authorize),

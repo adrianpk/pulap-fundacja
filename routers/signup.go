@@ -24,7 +24,7 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/gorilla/mux"
 )
@@ -35,6 +35,6 @@ func InitAPISignUpRouter() *mux.Router {
 	signupPath := "/api/v1/signup"
 	signupRouter := NewRouter()
 	// Resource
-	signupRouter.HandleFunc(signupPath, controllers.SignUp).Methods("POST")
+	signupRouter.HandleFunc(signupPath, api.SignUp).Methods("POST")
 	return signupRouter
 }

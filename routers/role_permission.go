@@ -25,7 +25,7 @@ package routers
 
 import (
 	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -38,11 +38,11 @@ func InitAPIRolePermissionRouter() *mux.Router {
 	// Router
 	rolePermissionRouter := apiV1Router.PathPrefix(rolePermissionsPath).Subrouter()
 	// Organization resource
-	rolePermissionRouter.HandleFunc("", controllers.GetRolePermissions).Methods("GET")
-	rolePermissionRouter.HandleFunc("", controllers.CreateRolePermission).Methods("POST")
-	rolePermissionRouter.HandleFunc("/{role-permission}", controllers.GetRolePermission).Methods("GET")
-	rolePermissionRouter.HandleFunc("/{role-permission}", controllers.UpdateRolePermission).Methods("PUT")
-	rolePermissionRouter.HandleFunc("/{role-permission}", controllers.DeleteRolePermission).Methods("DELETE")
+	rolePermissionRouter.HandleFunc("", api.GetRolePermissions).Methods("GET")
+	rolePermissionRouter.HandleFunc("", api.CreateRolePermission).Methods("POST")
+	rolePermissionRouter.HandleFunc("/{role-permission}", api.GetRolePermission).Methods("GET")
+	rolePermissionRouter.HandleFunc("/{role-permission}", api.UpdateRolePermission).Methods("PUT")
+	rolePermissionRouter.HandleFunc("/{role-permission}", api.DeleteRolePermission).Methods("DELETE")
 	// Middleware
 	apiV1Router.Handle(rolePermissionsPath, negroni.New(
 		negroni.HandlerFunc(bootstrap.Authorize),

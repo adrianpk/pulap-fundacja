@@ -1,6 +1,7 @@
 ---
   name: sample
-  #plural: lolas
+  #apiVer: v1
+  #plural: samples
   propertyDefs:
     - name: ID
       type: primary_key

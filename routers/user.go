@@ -24,7 +24,7 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 	"github.com/gorilla/mux"
 )
 
@@ -35,17 +35,17 @@ func InitAPIUserRouter() *mux.Router {
 	// Router
 	userRouter := apiV1Router.PathPrefix(usersPath).Subrouter()
 	// Resource
-	userRouter.HandleFunc("", controllers.GetUsers).Methods("GET")
-	userRouter.HandleFunc("", controllers.CreateUser).Methods("POST")
-	userRouter.HandleFunc("/{user}", controllers.GetUser).Methods("GET")
-	userRouter.HandleFunc("/{user}", controllers.UpdateUser).Methods("PUT")
-	userRouter.HandleFunc("/{user}", controllers.DeleteUser).Methods("DELETE")
+	userRouter.HandleFunc("", api.GetUsers).Methods("GET")
+	userRouter.HandleFunc("", api.CreateUser).Methods("POST")
+	userRouter.HandleFunc("/{user}", api.GetUser).Methods("GET")
+	userRouter.HandleFunc("/{user}", api.UpdateUser).Methods("PUT")
+	userRouter.HandleFunc("/{user}", api.DeleteUser).Methods("DELETE")
 	// Resource
-	userRouter.HandleFunc("/{user}/profile", controllers.GetUserProfile).Methods("GET")
-	userRouter.HandleFunc("/{user}/profile", controllers.CreateUserProfile).Methods("POST")
-	userRouter.HandleFunc("/{user}/profile", controllers.UpdateUserProfile).Methods("PUT")
-	userRouter.HandleFunc("/{user}/profile", controllers.DeleteUserProfile).Methods("DELETE")
+	userRouter.HandleFunc("/{user}/profile", api.GetUserProfile).Methods("GET")
+	userRouter.HandleFunc("/{user}/profile", api.CreateUserProfile).Methods("POST")
+	userRouter.HandleFunc("/{user}/profile", api.UpdateUserProfile).Methods("PUT")
+	userRouter.HandleFunc("/{user}/profile", api.DeleteUserProfile).Methods("DELETE")
 	// Resource
-	userRouter.HandleFunc("/{user}/profile/avatar", controllers.HandleAvatar)
+	userRouter.HandleFunc("/{user}/profile/avatar", api.HandleAvatar)
 	return userRouter
 }

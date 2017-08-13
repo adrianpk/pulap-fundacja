@@ -25,7 +25,7 @@ package routers
 
 import (
 	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -38,11 +38,11 @@ func InitAPIRoleRouter() *mux.Router {
 	// Router
 	roleRouter := apiV1Router.PathPrefix(rolesPath).Subrouter()
 	// Resource
-	roleRouter.HandleFunc("", controllers.GetRoles).Methods("GET")
-	roleRouter.HandleFunc("", controllers.CreateRole).Methods("POST")
-	roleRouter.HandleFunc("/{role}", controllers.GetRole).Methods("GET")
-	roleRouter.HandleFunc("/{role}", controllers.UpdateRole).Methods("PUT")
-	roleRouter.HandleFunc("/{role}", controllers.DeleteRole).Methods("DELETE")
+	roleRouter.HandleFunc("", api.GetRoles).Methods("GET")
+	roleRouter.HandleFunc("", api.CreateRole).Methods("POST")
+	roleRouter.HandleFunc("/{role}", api.GetRole).Methods("GET")
+	roleRouter.HandleFunc("/{role}", api.UpdateRole).Methods("PUT")
+	roleRouter.HandleFunc("/{role}", api.DeleteRole).Methods("DELETE")
 	// Middleware
 	apiV1Router.Handle(rolesPath, negroni.New(
 		negroni.HandlerFunc(bootstrap.Authorize),

@@ -24,7 +24,7 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/gorilla/mux"
 )
@@ -36,9 +36,9 @@ func InitAPIPlanSubscriptionRouter() *mux.Router {
 	// Router
 	planSubscriptionRouter := apiV1Router.PathPrefix(planSubscriptionPath).Subrouter()
 	// Resource
-	planSubscriptionRouter.HandleFunc("", controllers.GetPlanSubscription).Methods("GET")
-	planSubscriptionRouter.HandleFunc("", controllers.CreatePlanSubscription).Methods("POST")
-	planSubscriptionRouter.HandleFunc("", controllers.UpdatePlanSubscription).Methods("PUT")
-	planSubscriptionRouter.HandleFunc("", controllers.DeletePlanSubscription).Methods("DELETE")
+	planSubscriptionRouter.HandleFunc("", api.GetPlanSubscription).Methods("GET")
+	planSubscriptionRouter.HandleFunc("", api.CreatePlanSubscription).Methods("POST")
+	planSubscriptionRouter.HandleFunc("", api.UpdatePlanSubscription).Methods("PUT")
+	planSubscriptionRouter.HandleFunc("", api.DeletePlanSubscription).Methods("DELETE")
 	return planSubscriptionRouter
 }

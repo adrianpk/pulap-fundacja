@@ -24,7 +24,7 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/gorilla/mux"
 )
@@ -36,16 +36,16 @@ func InitAPIPropertiesSetRouter() *mux.Router {
 	// Router
 	propertiesSetRouter := apiV1Router.PathPrefix(propertiesSetsPath).Subrouter()
 	// Resource
-	propertiesSetRouter.HandleFunc("", controllers.GetPropertiesSets).Methods("GET")
-	propertiesSetRouter.HandleFunc("", controllers.CreatePropertiesSet).Methods("POST")
-	propertiesSetRouter.HandleFunc("/{properties-set}", controllers.GetPropertiesSet).Methods("GET")
-	propertiesSetRouter.HandleFunc("/{properties-set}", controllers.UpdatePropertiesSet).Methods("PUT")
-	propertiesSetRouter.HandleFunc("/{properties-set}", controllers.DeletePropertiesSet).Methods("DELETE")
+	propertiesSetRouter.HandleFunc("", api.GetPropertiesSets).Methods("GET")
+	propertiesSetRouter.HandleFunc("", api.CreatePropertiesSet).Methods("POST")
+	propertiesSetRouter.HandleFunc("/{properties-set}", api.GetPropertiesSet).Methods("GET")
+	propertiesSetRouter.HandleFunc("/{properties-set}", api.UpdatePropertiesSet).Methods("PUT")
+	propertiesSetRouter.HandleFunc("/{properties-set}", api.DeletePropertiesSet).Methods("DELETE")
 	// // Resource
-	// propertiesSetRouter.HandleFunc("/{properties-set}/properties", controllers.GetProperties).Methods("GET")
-	// propertiesSetRouter.HandleFunc("/{properties-set}/properties", controllers.CreateProperty).Methods("POST")
-	// propertiesSetRouter.HandleFunc("/{properties-set}/properties/{property}", controllers.GetProperty).Methods("GET")
-	// propertiesSetRouter.HandleFunc("/{properties-set}/properties/{property}", controllers.UpdateProperty).Methods("PUT")
-	// propertiesSetRouter.HandleFunc("/{properties-set}/properties/{property}", controllers.DeleteProperty).Methods("DELETE")
+	// propertiesSetRouter.HandleFunc("/{properties-set}/properties", api.GetProperties).Methods("GET")
+	// propertiesSetRouter.HandleFunc("/{properties-set}/properties", api.CreateProperty).Methods("POST")
+	// propertiesSetRouter.HandleFunc("/{properties-set}/properties/{property}", api.GetProperty).Methods("GET")
+	// propertiesSetRouter.HandleFunc("/{properties-set}/properties/{property}", api.UpdateProperty).Methods("PUT")
+	// propertiesSetRouter.HandleFunc("/{properties-set}/properties/{property}", api.DeleteProperty).Methods("DELETE")
 	return propertiesSetRouter
 }

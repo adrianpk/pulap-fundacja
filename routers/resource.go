@@ -25,7 +25,7 @@ package routers
 
 import (
 	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/fundacja/api"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -38,11 +38,11 @@ func InitAPIResourceRoutes() *mux.Router {
 	// Router
 	resourceRouter := apiV1Router.PathPrefix(resourcesPath).Subrouter()
 	// Resource
-	resourceRouter.HandleFunc("", controllers.GetResources).Methods("GET")
-	resourceRouter.HandleFunc("", controllers.CreateResource).Methods("POST")
-	resourceRouter.HandleFunc("/{resource}", controllers.GetResource).Methods("GET")
-	resourceRouter.HandleFunc("/{resource}", controllers.UpdateResource).Methods("PUT")
-	resourceRouter.HandleFunc("/{resource}", controllers.DeleteResource).Methods("DELETE")
+	resourceRouter.HandleFunc("", api.GetResources).Methods("GET")
+	resourceRouter.HandleFunc("", api.CreateResource).Methods("POST")
+	resourceRouter.HandleFunc("/{resource}", api.GetResource).Methods("GET")
+	resourceRouter.HandleFunc("/{resource}", api.UpdateResource).Methods("PUT")
+	resourceRouter.HandleFunc("/{resource}", api.DeleteResource).Methods("DELETE")
 	// Middleware
 	apiV1Router.Handle(resourcesPath, negroni.New(
 		negroni.HandlerFunc(bootstrap.Authorize),
