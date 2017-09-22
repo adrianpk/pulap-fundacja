@@ -1,0 +1,28 @@
+${define "head"}
+${$organization := .Model}
+<title>Show Organization - {{$organization.Organizationname.String}}</title>
+${end}
+
+${define "body"}
+${$organization := .Model}
+<div id="app" class="container">
+  <div class="mt-3">
+  	<h1>Show Organization <i class="fa a-check"></i></h1>
+  </div>
+  <div>
+    <p>
+			<a href="/organizations" >Organizations</a>
+		</p>
+    <p>UserID:<br> ${$organization.UserID.String}</p>
+    <p>Name:<br> ${$organization.Name.String}</p>
+    <p>Description:<br> ${$organization.Description.String}</p>
+    <p>
+      ${ if $organization.IsActive.Bool }
+        Active: <i class="fa fa-check"></i>
+      ${ else }
+        <span class="striked-out">Active</span>: <i class="fa fa-times "></i>
+      ${ end }
+    </p>
+  </div>
+</div>
+${end}

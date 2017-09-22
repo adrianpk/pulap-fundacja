@@ -27,14 +27,15 @@ import (
 	// Only for the page initialization side effects.
 	"net/http"
 
+	"github.com/adrianpk/fundacja/bootstrap"
 	"github.com/adrianpk/fundacja/routers"
 
 	"github.com/codegangsta/negroni"
 )
 
 // AppHandler - Retrive App handler.
-func AppHandler() http.Handler {
+func AppHandler(config bootstrap.Configuration) http.Handler {
 	n := negroni.Classic()
-	n.UseHandler(routers.GetRouter())
+	n.UseHandler(routers.GetRouter(config))
 	return n
 }

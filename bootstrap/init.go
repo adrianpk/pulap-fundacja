@@ -24,7 +24,9 @@
 
 package bootstrap
 
-import "log"
+import (
+	"log"
+)
 
 const (
 	rollbackAll   = true

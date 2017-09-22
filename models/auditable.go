@@ -29,12 +29,12 @@ import (
 
 // AuditableModel - Common properties for auditable models.
 type AuditableModel struct {
-	StartedAt        nulls.Time   `db:"started_at" json:"startedAt, omitempty"`
-	CreatedBy        nulls.String `db:"created_by" json:"createdBy, omitempty"`
-	IsActive         nulls.Bool   `db:"is_active" json:"isActive, omitempty"`
+	StartedAt        nulls.Time   `db:"started_at" json:"startedAt, omitempty" schema:"-"`
+	CreatedBy        nulls.String `db:"created_by" json:"createdBy, omitempty" schema:"-"`
+	IsActive         nulls.Bool   `db:"is_active" json:"isActive, omitempty" schema:"is-active"`
 	IsLogicalDeleted nulls.Bool   `db:"is_logical_deleted" json:"isLogicalDeleted, omitempty"`
-	CreatedAt        nulls.Time   `db:"created_at" json:"createdAt, omitempty"`
-	UpdatedAt        nulls.Time   `db:"updated_at" json:"updatedAt, omitempty"`
+	CreatedAt        nulls.Time   `db:"created_at" json:"createdAt, omitempty" schema:"-"`
+	UpdatedAt        nulls.Time   `db:"updated_at" json:"updatedAt, omitempty" schema:"-"`
 }
 
 // SetCreationValues - Default values for models after creation.

@@ -27,6 +27,7 @@ CREATE TABLE organizations
  description VARCHAR(255) NULL,
  annotations JSONB NULL,
  started_at TIMESTAMP WITH TIME ZONE,
+ user_username VARCHAR(32),
  user_id UUID,
  geolocation GEOGRAPHY(Point,4326),
  created_by UUID NULL,

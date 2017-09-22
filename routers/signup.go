@@ -24,17 +24,23 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/api"
+	"github.com/adrianpk/fundacja/controllers"
+	"github.com/codegangsta/negroni"
 
 	"github.com/gorilla/mux"
 )
 
-// InitAPILoginAndSignUpRouter - Initialize API router for login and sign up.
-func InitAPISignUpRouter() *mux.Router {
+// InitSignUpRouter - Initialize router for sign up.
+func InitSignUpRouter() *mux.Router {
 	// Paths
-	signupPath := "/api/v1/signup"
 	signupRouter := NewRouter()
 	// Resource
-	signupRouter.HandleFunc(signupPath, api.SignUp).Methods("POST")
+	signupRouter.HandleFunc(signupPath, controllers.ShowSignUp).Methods("GET")
+	signupRouter.HandleFunc(signupPath, controllers.SignUp).Methods("POST")
+	// Middleware
+	appRouter.PathPrefix(signupPath).Handler(
+		negroni.New(
+			negroni.Wrap(signupRouter),
+		))
 	return signupRouter
 }

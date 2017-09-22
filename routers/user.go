@@ -24,28 +24,38 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/api"
+	"github.com/adrianpk/fundacja/controllers"
 	"github.com/gorilla/mux"
 )
 
-// InitAPIUserRouter - Initialize API router for users.
-func InitAPIUserRouter() *mux.Router {
+// InitUserRouter - Initialize router for users.
+func InitUserRouter() *mux.Router {
 	// Paths
-	usersPath := "/api/v1/users"
+	usersPath := "/users" ///{rest:.*}
 	// Router
-	userRouter := apiV1Router.PathPrefix(usersPath).Subrouter()
+	userRouter := appRouter.PathPrefix(usersPath).Subrouter()
+	userRouter.StrictSlash(true)
 	// Resource
-	userRouter.HandleFunc("", api.GetUsers).Methods("GET")
-	userRouter.HandleFunc("", api.CreateUser).Methods("POST")
-	userRouter.HandleFunc("/{user}", api.GetUser).Methods("GET")
-	userRouter.HandleFunc("/{user}", api.UpdateUser).Methods("PUT")
-	userRouter.HandleFunc("/{user}", api.DeleteUser).Methods("DELETE")
+	userRouter.HandleFunc("/", controllers.IndexUsers).Methods("GET")
+	userRouter.HandleFunc("/new", controllers.NewUser).Methods("GET")
+	userRouter.HandleFunc("", controllers.CreateUser).Methods("POST")
+	userRouter.HandleFunc("/{user}", controllers.ShowUser).Methods("GET")
+	userRouter.HandleFunc("/edit/{user}", controllers.EditUser).Methods("GET")
+	userRouter.HandleFunc("/{user}", controllers.UpdateUser).Methods("POST")
+	userRouter.HandleFunc("/init-delete/{user}", controllers.InitDeleteUser).Methods("POST")
+	userRouter.HandleFunc("/delete/{user}", controllers.DeleteUser).Methods("POST")
 	// Resource
-	userRouter.HandleFunc("/{user}/profile", api.GetUserProfile).Methods("GET")
-	userRouter.HandleFunc("/{user}/profile", api.CreateUserProfile).Methods("POST")
-	userRouter.HandleFunc("/{user}/profile", api.UpdateUserProfile).Methods("PUT")
-	userRouter.HandleFunc("/{user}/profile", api.DeleteUserProfile).Methods("DELETE")
+	userRouter.HandleFunc("/{user}/profile", controllers.GetUserProfile).Methods("GET")
+	userRouter.HandleFunc("/{user}/profile", controllers.CreateUserProfile).Methods("POST")
+	userRouter.HandleFunc("/{user}/profile", controllers.UpdateUserProfile).Methods("PUT")
+	userRouter.HandleFunc("/{user}/profile", controllers.DeleteUserProfile).Methods("DELETE")
 	// Resource
-	userRouter.HandleFunc("/{user}/profile/avatar", api.HandleAvatar)
+	userRouter.HandleFunc("/{user}/profile/avatar", controllers.HandleAvatar)
+	// Middleware
+	// appRouter.PathPrefix(usersPath).Handler(
+	// 	negroni.New(
+	// 		//negroni.HandlerFunc(bootstrap.Authorize),
+	// 		negroni.Wrap(userRouter),
+	// 	))
 	return userRouter
 }

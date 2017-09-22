@@ -1,0 +1,40 @@
+${define "head"}<title>Sign Up</title>${end}
+${define "body"}
+<div id="app" class="container">
+	<div>
+		<div class="container">
+			<form id="signup-form" class="form-signin" action="/signup" method="post" role="form">
+				<h2 class="form-signin-heading">Sign up</h2>
+				<div>
+					<label>
+						<a href="/login" >Login</a>
+					</label>
+				</div>
+				<!-- Username field-->
+				<div class="form-group">
+          <input id="username" type="text" class="form-control fnd-form-control" name="username" value="" placeholder="Username">
+					<span>
+            <small id="username-error" class="text-danger container-error"></small>
+          </span>
+        </div>
+				<!-- Email field-->
+				<div class="form-group">
+          <input id="email" type="email" class="form-control fnd-form-control" name="email" value="" placeholder="email">
+					<span>
+            <small id="emailError" class="text-danger container-error"></small>
+          </span>
+        </div>
+			  <!-- Password field-->
+				<div class="form-group">
+          <input id="password" type="password" type="password" class="form-control fnd-form-control" name="password" value="" placeholder="password">
+          <input id="password-confirmation" type="password" class="form-control fnd-form-control" name="password-confirmation" value="" placeholder="confirmation">
+					<span>
+						<small id="password-error" class="text-danger container-error"></small>
+					</span>
+        </div>
+				<button type="submit" class="btn btn-lg btn-primary btn-block">Sign Up</button>
+			</form>
+		</div>
+	</div>
+</div>
+${end}

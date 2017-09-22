@@ -33,6 +33,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"path"
 	"regexp"
 	"strings"
 
@@ -353,9 +354,10 @@ func (fi *FileInfo) ValidateSize() (valid bool) {
 
 // SetKey - Creates and Sets the FileInfo Key property.
 func (fi *FileInfo) SetKey(checksum uint32) {
-	fi.Key = escape(string(fi.Type)) + "/" +
-		escape(fmt.Sprint(checksum)) + "/" +
-		escape(string(fi.Name))
+	// fi.Key = escape(string(fi.Type)) + "/" +
+	// 	escape(fmt.Sprint(checksum)) + "/" +
+	// 	escape(string(fi.Name))
+	fi.Key = path.Join(escape(string(fi.Type)), escape(fmt.Sprint(checksum)), escape(string(fi.Name)))
 }
 
 // func (fi *FileInfo) createThumb(buffer *bytes.Buffer, c context.Context) {

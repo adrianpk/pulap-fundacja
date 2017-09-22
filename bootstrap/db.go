@@ -25,9 +25,10 @@
 package bootstrap
 
 import (
+	"path"
+
 	"github.com/adrianpk/fundacja/db"
 	"github.com/adrianpk/fundacja/logger"
-	"path"
 )
 
 const (
@@ -97,9 +98,10 @@ func migrationSwitches() {
 }
 
 func dbConfig() {
-	db.DBConfig.Host = AppConfig.DBHost
-	db.DBConfig.DB = AppConfig.Database
-	db.DBConfig.User = AppConfig.DBUser
-	db.DBConfig.Pass = AppConfig.DBPass
-	db.DBConfig.SSL = AppConfig.DBSSL
+	dbConfig := AppConfig.GetDBConnParamenters()
+	db.DBConfig.Host = dbConfig["DBHost"]
+	db.DBConfig.DB = dbConfig["Database"]
+	db.DBConfig.User = dbConfig["DBUser"]
+	db.DBConfig.Pass = dbConfig["DBPass"]
+	db.DBConfig.SSL = dbConfig["DBSSL"]
 }

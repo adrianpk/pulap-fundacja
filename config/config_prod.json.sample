@@ -1,10 +1,13 @@
 {
-  "Server"  : "0.0.0.0:8080",
-  "DBHost"  : "127.0.0.1",
-  "Database": "dbname",
-  "DBUser"  : "dbuser",
-  "DBPass"	: "dbpass",
-  "DBSSL"   : "require",
-  "LogLevel": 1,
-  "LogFile" : "/tmp/logs.txt"
+  "Server"       : "0.0.0.0:8080",
+  "DBHost"       : "127.0.0.1",
+  "Database"     : "dbname",
+  "DBUser"       : "dbuser",
+  "DBPass"	     : "dbpass",
+  "DBSSL"        : "require",
+  "ResourcesDir" : "/home/user/apps/fundacja/resources",
+  "PublicDir"    : "/home/user/public/fundacja",
+  "LogFile"      : "/home/user/tmp/fundacja.log",
+  "LogLevel"     : 1,
+  "Autoreload"   : false
 }

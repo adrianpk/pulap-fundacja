@@ -1,0 +1,28 @@
+${define "head"}
+${$user := .Model}
+<title>Show User - {{$user.Username.String}}</title>
+${end}
+
+${define "body"}
+${$user := .Model}
+<div id="app" class="container">
+  <div class="mt-3">
+  	<h1>Show User <i class="fa a-check"></i></h1>
+  </div>
+  <div>
+    <p>
+			<a href="/users" >Users</a>
+		</p>
+    <p>Username:<br> ${$user.Username.String}</p>
+    <p>Email:<br> ${$user.Email.String}</p>
+    <p>Name:<br> ${$user.FirstName.String} ${$user.MiddleNames.String} ${$user.LastName.String}</p>
+    <p>
+      ${ if $user.IsActive.Bool }
+        Active: <i class="fa fa-check"></i>
+      ${ else }
+        <span class="striked-out">Active</span>: <i class="fa fa-times "></i>
+      ${ end }
+    </p>
+  </div>
+</div>
+${end}

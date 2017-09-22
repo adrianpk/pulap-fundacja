@@ -24,7 +24,7 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/api"
+	"github.com/adrianpk/fundacja/controllers"
 
 	"github.com/gorilla/mux"
 )
@@ -32,50 +32,58 @@ import (
 // InitOrganizationRouter - Initialize API router for organizations.
 func InitOrganizationRouter() *mux.Router {
 	// Paths
-	organizationPath := "/api/v1/organizations"
+	organizationPath := "/organizations" ///{rest:.*}
 	// Router
-	organizationRouter := apiV1Router.PathPrefix(organizationPath).Subrouter()
+	organizationRouter := appRouter.PathPrefix(organizationPath).Subrouter()
+	organizationRouter.StrictSlash(true)
 	// Resource
-	organizationRouter.HandleFunc("", api.GetOrganizations).Methods("GET")
-	organizationRouter.HandleFunc("", api.CreateOrganization).Methods("POST")
-	organizationRouter.HandleFunc("/{organization}", api.GetOrganization).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}", api.UpdateOrganization).Methods("PUT")
-	organizationRouter.HandleFunc("/{organization}", api.DeleteOrganization).Methods("DELETE")
+	organizationRouter.HandleFunc("/", controllers.IndexOrganizations).Methods("GET")
+	organizationRouter.HandleFunc("/new", controllers.NewOrganization).Methods("GET")
+	organizationRouter.HandleFunc("", controllers.CreateOrganization).Methods("POST")
+	organizationRouter.HandleFunc("/{organization}", controllers.ShowOrganization).Methods("GET")
+	organizationRouter.HandleFunc("/edit/{organization}", controllers.EditOrganization).Methods("GET")
+	organizationRouter.HandleFunc("/{organization}", controllers.UpdateOrganization).Methods("POST")
+	organizationRouter.HandleFunc("/init-delete/{organization}", controllers.InitDeleteOrganization).Methods("POST")
+	organizationRouter.HandleFunc("/delete/{organization}", controllers.DeleteOrganization).Methods("POST")
 	// Resource
-	organizationRouter.HandleFunc("/{organization}/resources", api.GetResources).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/resources", api.CreateResource).Methods("POST")
-	organizationRouter.HandleFunc("/{organization}/resources/{resource}", api.GetResource).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/resources/{resource}", api.UpdateResource).Methods("PUT")
-	organizationRouter.HandleFunc("/{organization}/resources/{resource}", api.DeleteResource).Methods("DELETE")
+	// organizationRouter.HandleFunc("/{organization}/resources", controllers.GetResources).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/resources", controllers.CreateResource).Methods("POST")
+	// organizationRouter.HandleFunc("/{organization}/resources/{resource}", controllers.GetResource).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/resources/{resource}", controllers.UpdateResource).Methods("PUT")
+	// organizationRouter.HandleFunc("/{organization}/resources/{resource}", controllers.DeleteResource).Methods("DELETE")
 	// Resource
-	organizationRouter.HandleFunc("/{organization}/permissions", api.GetPermissions).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/permissions", api.CreatePermission).Methods("POST")
-	organizationRouter.HandleFunc("/{organization}/permissions/{permission}", api.GetPermission).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/permissions/{permission}", api.UpdatePermission).Methods("PUT")
-	organizationRouter.HandleFunc("/{organization}/permissions/{permission}", api.DeletePermission).Methods("DELETE")
-	// Resource
-	organizationRouter.HandleFunc("/{organization}/resource-permissions", api.GetResourcePermissions).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/resource-permissions", api.CreateResourcePermission).Methods("POST")
-	organizationRouter.HandleFunc("/{organization}/resource-permissions/{resource-permission}", api.GetResourcePermission).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/resource-permissions/{resource-permission}", api.UpdateResourcePermission).Methods("PUT")
-	organizationRouter.HandleFunc("/{organization}/resource-permissions/{resource-permission}", api.DeleteResourcePermission).Methods("DELETE")
-	// Resource
-	organizationRouter.HandleFunc("/{organization}/roles", api.GetRoles).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/roles", api.CreateRole).Methods("POST")
-	organizationRouter.HandleFunc("/{organization}/roles/{role}", api.GetRole).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/roles/{role}", api.UpdateRole).Methods("PUT")
-	organizationRouter.HandleFunc("/{organization}/roles/{role}", api.DeleteRole).Methods("DELETE")
-	// Resource
-	organizationRouter.HandleFunc("/{organization}/role-permissions", api.GetRolePermissions).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/role-permissions", api.CreateRolePermission).Methods("POST")
-	organizationRouter.HandleFunc("/{organization}/role-permissions/{role-permission}", api.GetRolePermission).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/role-permissions/{role-permission}", api.UpdateRolePermission).Methods("PUT")
-	organizationRouter.HandleFunc("/{organization}/role-permissions/{role-permission}", api.DeleteRolePermission).Methods("DELETE")
-	// Resource
-	organizationRouter.HandleFunc("/{organization}/user-roles", api.GetUserRoles).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/user-roles", api.CreateUserRole).Methods("POST")
-	organizationRouter.HandleFunc("/{organization}/user-roles/{user-role}", api.GetUserRole).Methods("GET")
-	organizationRouter.HandleFunc("/{organization}/user-roles/{user-role}", api.UpdateUserRole).Methods("PUT")
-	organizationRouter.HandleFunc("/{organization}/user-roles/{user-role}", api.DeleteUserRole).Methods("DELETE")
+	organizationRouter.HandleFunc("/{organization}/permissions/", controllers.IndexPermissions).Methods("GET")
+	organizationRouter.HandleFunc("/{organization}/permissions/new", controllers.NewPermission).Methods("GET")
+	organizationRouter.HandleFunc("/{organization}/permissions", controllers.CreatePermission).Methods("POST")
+	organizationRouter.HandleFunc("/{organization}/permissions/{permission}", controllers.ShowPermission).Methods("GET")
+	organizationRouter.HandleFunc("/{organization}/permissions/edit/{permission}", controllers.EditPermission).Methods("GET")
+	organizationRouter.HandleFunc("/{organization}/permissions/{permission}", controllers.UpdatePermission).Methods("POST")
+	organizationRouter.HandleFunc("/{organization}/permissions/init-delete/{permission}", controllers.InitDeletePermission).Methods("POST")
+	organizationRouter.HandleFunc("/{organization}/permissions/delete/{permission}", controllers.DeletePermission).Methods("POST")
+
+	// // Resource
+	// organizationRouter.HandleFunc("/{organization}/resource-permissions", controllers.GetResourcePermissions).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/resource-permissions", controllers.CreateResourcePermission).Methods("POST")
+	// organizationRouter.HandleFunc("/{organization}/resource-permissions/{resource-permission}", controllers.GetResourcePermission).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/resource-permissions/{resource-permission}", controllers.UpdateResourcePermission).Methods("PUT")
+	// organizationRouter.HandleFunc("/{organization}/resource-permissions/{resource-permission}", controllers.DeleteResourcePermission).Methods("DELETE")
+	// // Resource
+	// organizationRouter.HandleFunc("/{organization}/roles", controllers.GetRoles).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/roles", controllers.CreateRole).Methods("POST")
+	// organizationRouter.HandleFunc("/{organization}/roles/{role}", controllers.GetRole).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/roles/{role}", controllers.UpdateRole).Methods("PUT")
+	// organizationRouter.HandleFunc("/{organization}/roles/{role}", controllers.DeleteRole).Methods("DELETE")
+	// // Resource
+	// organizationRouter.HandleFunc("/{organization}/role-permissions", controllers.GetRolePermissions).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/role-permissions", controllers.CreateRolePermission).Methods("POST")
+	// organizationRouter.HandleFunc("/{organization}/role-permissions/{role-permission}", controllers.GetRolePermission).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/role-permissions/{role-permission}", controllers.UpdateRolePermission).Methods("PUT")
+	// organizationRouter.HandleFunc("/{organization}/role-permissions/{role-permission}", controllers.DeleteRolePermission).Methods("DELETE")
+	// // Resource
+	// organizationRouter.HandleFunc("/{organization}/organization-roles", controllers.GetOrganizationRoles).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/organization-roles", controllers.CreateOrganizationRole).Methods("POST")
+	// organizationRouter.HandleFunc("/{organization}/organization-roles/{organization-role}", controllers.GetOrganizationRole).Methods("GET")
+	// organizationRouter.HandleFunc("/{organization}/organization-roles/{organization-role}", controllers.UpdateOrganizationRole).Methods("PUT")
+	// organizationRouter.HandleFunc("/{organization}/organization-roles/{organization-role}", controllers.DeleteOrganizationRole).Methods("DELETE")
 	return organizationRouter
 }

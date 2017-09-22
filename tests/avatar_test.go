@@ -245,7 +245,7 @@ func TestUploadAvatar(t *testing.T) {
 
 func sampleBase64Image() string {
 	pngFilePath := currentDir()
-	pngFile := "resources/testdata/sampleavatar.png"
+	pngFile := path.Join("resources", "testdata", "sampleavatar.png")
 	imgFile, err := os.Open(path.Join(pngFilePath, pngFile))
 	if err != nil {
 		fmt.Println(err)

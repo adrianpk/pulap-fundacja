@@ -30,6 +30,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/adrianpk/fundacja/db"
+	"github.com/adrianpk/fundacja/logger"
 	"github.com/adrianpk/fundacja/models"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Import pq without side effect
@@ -77,13 +78,16 @@ func (repo *UserRepository) Create(user *models.User) error {
 // Login - Retrive a User if username/email and provided
 func (repo *UserRepository) Login(user models.User) (models.User, error) {
 	u := models.User{}
+	logger.Debugf("User / Password: %s / %s", user.Username.String, user.Email.String)
 	err := repo.DB.Get(&u, "SELECT * FROM users WHERE username = $1 OR email=$2 LIMIT 1", user.Username, user.Email)
 	if err != nil {
+		logger.Debugf("Error 1: %s", err)
 		return user, err
 	}
 	// Validate password
 	err = bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(user.Password))
 	if err != nil {
+		logger.Debugf("Error 2: %s", err)
 		return user, err
 	}
 	return u, nil
@@ -140,6 +144,7 @@ func (repo *UserRepository) Update(user *models.User) error {
 	query.WriteString(fmt.Sprintf("WHERE id = '%s';", user.ID.String))
 	tx := repo.DB.MustBegin()
 	_, err = tx.NamedExec(query.String(), &user)
+	//logger.Debugf("Query: %s", query.String())
 	if err != nil {
 		return err
 	}

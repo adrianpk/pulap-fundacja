@@ -26,7 +26,10 @@ package controllers
 import (
 	"bytes"
 	"fmt"
+	htmlTemplate "html/template"
+	"log"
 	"net/http"
+	"path"
 	"strings"
 
 	"github.com/adrianpk/fundacja/app"
@@ -34,9 +37,34 @@ import (
 	"github.com/adrianpk/fundacja/logger"
 	"github.com/adrianpk/fundacja/models"
 	"github.com/adrianpk/fundacja/repo"
+	"github.com/adrianpk/fundacja/views"
+	"github.com/arschles/go-bindata-html-template"
 
 	"github.com/twinj/uuid"
 )
+
+const (
+	indexView       = "index"
+	newView         = "new"
+	showView        = "show"
+	editView        = "edit"
+	deleteView      = "delete"
+	loginView       = "login"
+	signupView      = "signup"
+	layoutView      = "layout"
+	useExtTemplates = true
+)
+
+var (
+	layoutsAssetsBase   = "" //path.Join("resources", "templates", "layouts")
+	layoutExtAssetsBase string
+)
+
+// Initialize controller
+func Initialize() {
+	InitializeUser()
+	InitializeOrganization()
+}
 
 func isUUID(id string) bool {
 	_, err := uuid.Parse(id)
@@ -217,4 +245,93 @@ func formatRequest(r *http.Request) string {
 	}
 	// Return the request as a string
 	return strings.Join(request, "\n")
+}
+
+func viewAssetPath(base, asset string) string {
+	return path.Join(base, asset+".tmpl")
+}
+
+// Render templates for the given name, template definition and data object
+func renderTemplate(w http.ResponseWriter, r *http.Request, assetsBasePath, groupName, name string, cache map[string]*template.Template, pageModel interface{}) {
+	// Ensure the template exists in the map.
+	templKey := viewAssetPath(assetsBasePath, groupName)
+	view, ok := cache[templKey]
+	if !ok {
+		log.Fatalf("Error loading template %s", templKey)
+		redirectTo(w, r, "/", makePageAlertFromError(app.ErrRequestProcessing, warningAlert))
+		return
+	}
+	err := view.ExecuteTemplate(w, name, pageModel)
+	if err != nil {
+		log.Fatalf("Error executing template: %s", err)
+		redirectTo(w, r, "/", makePageAlertFromError(app.ErrRequestProcessing, warningAlert))
+		return
+	}
+}
+
+// Render templates for the given name, template definition and data object
+func renderExtTemplate(w http.ResponseWriter, r *http.Request, assetsBasePath, groupName, name string, cache map[string]*htmlTemplate.Template, pageModel interface{}) {
+	// Ensure the template exists in the map.
+	templKey := viewAssetPath(assetsBasePath, groupName)
+	view, ok := cache[templKey]
+	if !ok {
+		log.Fatalf("Error loading template %s", templKey)
+		redirectTo(w, r, "/", makePageAlertFromError(app.ErrRequestProcessing, warningAlert))
+		return
+	}
+	err := view.ExecuteTemplate(w, name, pageModel)
+	if err != nil {
+		log.Fatalf("Error executing template: %s", err)
+		redirectTo(w, r, "/", makePageAlertFromError(app.ErrRequestProcessing, warningAlert))
+	}
+}
+
+// Redirects to some page with custom alert.
+func redirectTo(w http.ResponseWriter, r *http.Request, url string, alert *PageAlert) {
+	logger.Debugf("Redirecting to %s", url)
+	http.Redirect(w, r, url, 302)
+}
+
+func showError(w http.ResponseWriter, r *http.Request, page string, layout string, model interface{}, err error, alertKind string, cause error) {
+	logger.Dump(cause)
+	//pageModel := makePage(model, makePageAlert(err.Error(), alertKind))
+	//renderUserTemplate(w, r, page, layoutView, pageModel)
+	redirectTo(w, r, "/", makePageAlert(err.Error(), alertKind))
+}
+
+func parseAssets(entityAssetsBase *string, layoutsDir, templatesDir, layoutName string, assetNames []string, templatesMap map[string]*template.Template) {
+	//logger.Debug("Parsing user assets...")
+	layoutAssetName := layoutView
+	layoutsAssetsBase = path.Join("resources", "templates", layoutsDir)
+	*entityAssetsBase = path.Join("resources", "templates", templatesDir)
+	layoutFile := viewAssetPath(layoutsAssetsBase, layoutAssetName)
+	for i := range assetNames {
+		templateFile := viewAssetPath(*entityAssetsBase, assetNames[i])
+		//logger.Debugf("Retrieving resource %s", templateFile)
+		templ, err := template.New(templateFile, views.Asset).Delims("${", "}").ParseFiles(templateFile, layoutFile)
+		if err != nil {
+			logger.Debugf("Error parsing asset %s: %s", templateFile, err)
+		}
+		//logger.Debugf("Storing template %s ", templateFile)
+		templatesMap[templateFile] = templ
+	}
+}
+
+func parseExtAssets(entityExtAssetsBase *string, layoutsDir, templatesDir, layoutName string, assetNames []string, templatesMap map[string]*htmlTemplate.Template) {
+	//logger.Debug("Parsing user assets...")
+	layoutExtAssetsBase = path.Join(bootstrap.AppConfig.GetResourcesDir(), "templates", layoutsDir)
+	*entityExtAssetsBase = path.Join(bootstrap.AppConfig.GetResourcesDir(), "templates", templatesDir)
+	//logger.Debugf("Organization external assets base dir: %s", userExtAssetsBase)
+	layoutAssetName := layoutView
+	layoutFile := viewAssetPath(layoutExtAssetsBase, layoutAssetName)
+	for i := range assetNames {
+		templateFile := viewAssetPath(*entityExtAssetsBase, assetNames[i])
+		//logger.Debugf("Retrieving resource %s", templateFile)
+		templ, err := htmlTemplate.New(templateFile).Delims("${", "}").ParseFiles(templateFile, layoutFile)
+		if err != nil {
+			logger.Debugf("Error parsing asset %s: %s", templateFile, err)
+		}
+		//logger.Debugf("Storing template %s ", templateFile)
+		templatesMap[templateFile] = templ
+	}
 }

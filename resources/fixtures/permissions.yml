@@ -25,6 +25,7 @@
   id: cf903818-a2c5-46c2-8935-c4fc66fea60f
   name: Permission1
   description: Permission1 description
+  organization_name: Organization
   organization_id: d43809a2-5896-43c4-808e-549f2ee47783
   created_by: 5958b185-8150-4aae-b53f-0c44771ddec5
   is_active: true
@@ -35,7 +36,8 @@
 -
   id: 131a9338-39aa-4c33-8661-dcfa21ce726f
   name: Permission2
-  description: Permission2 description 
+  description: Permission2 description
+  organization_name: Organization2
   organization_id: b8cef4be-1ec3-44b4-9cbd-551f039f4fc7
   created_by: 3c05e701-b495-4443-b454-2c37e2ecccdf
   is_active: true

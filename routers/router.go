@@ -28,47 +28,45 @@ import (
 	"net/http"
 
 	"github.com/adrianpk/fundacja/bootstrap"
+	"github.com/adrianpk/fundacja/logger"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 )
 
 var (
-	appRouter   *mux.Router
-	apiV1Router *mux.Router
+	appRouter     *mux.Router
+	apiV1Router   *mux.Router
+	apiLoginPath  string
+	apiSignupPath string
+	loginPath     string
+	signupPath    string
 )
 
 // GetRouter - Returns app main router
-func GetRouter() *mux.Router {
+func GetRouter(config bootstrap.Configuration) *mux.Router {
 	InitAppRouter()
+	InitSignupAndLoginRouter()
+	InitSubRouters()
 	InitAPIV1Router()
 	InitAPIV1SubRouters()
+	InitPublicFilesystem(config.GetPublicDir())
 	return appRouter
 }
 
 // InitAppRouter - Initialize app routes.
 func InitAppRouter() {
 	appRouter = NewRouter()
-	appRouter.HandleFunc("/", home())
+	//appRouter.HandleFunc("/", home())
 }
 
 // InitAPIV1Router - Get a router for API calls.
 func InitAPIV1Router() {
 	apiV1Path := "/api/v1"
-	loginPath := "/api/v1/login"
-	signupPath := "/api/v1/signup"
+	apiLoginPath = "/api/v1/login"
+	apiSignupPath = "/api/v1/signup"
 	apiV1Router = NewRouter()
-	loginRouter := InitAPILoginRouter()
-	signupRouter := InitAPISignUpRouter()
-	// Login Middleware
-	appRouter.PathPrefix(loginPath).Handler(
-		negroni.New(
-			negroni.Wrap(loginRouter),
-		))
-	// Signup Middleware
-	appRouter.PathPrefix(signupPath).Handler(
-		negroni.New(
-			negroni.Wrap(signupRouter),
-		))
+	InitAPILoginRouter()
+	InitAPISignUpRouter()
 	// Middleware
 	appRouter.PathPrefix(apiV1Path).Handler(
 		negroni.New(
@@ -80,11 +78,59 @@ func InitAPIV1Router() {
 // InitAPIV1SubRouters - Initialize API subrouters.
 func InitAPIV1SubRouters() {
 	InitAPIUserRouter()
-	InitOrganizationRouter()
+	InitAPIOrganizationRouter()
 	InitAPIPropertiesSetRouter()
 	InitAPIPropertyRouter()
 	InitAPIPlanSubscriptionRouter()
 	InitAPIPlanRouter()
+}
+
+// InitSignupAndLoginRouter - Get a router for API calls.
+func InitSignupAndLoginRouter() {
+	loginPath = "/login"
+	signupPath = "/signup"
+	InitLoginRouter()
+	InitSignUpRouter()
+	// Middleware
+	// appRouter.PathPrefix(apiV1Path).Handler(
+	// 	negroni.New(
+	// 		//negroni.HandlerFunc(bootstrap.Authorize),
+	// 		negroni.Wrap(apiV1Router),
+	// 	))
+}
+
+// InitSubRouters - Initialize subrouters.
+func InitSubRouters() {
+	InitUserRouter()
+	InitOrganizationRouter()
+	// InitAPIPropertiesSetRouter()
+	// InitAPIPropertyRouter()
+	// InitAPIPlanSubscriptionRouter()
+	// InitAPIPlanRouter()
+}
+
+// InitPublicFilesystem - Initialize public filesystem.
+func InitPublicFilesystem(publicDir string) {
+	// Paths
+	//publicFsPath := "/Users/adrian/go/src/github.com/adrianpk/fundacja/resources/public"
+	publicPath := "/{rest:.*}"
+	// Fileserver
+	fsServer := http.FileServer(http.Dir(publicDir))
+	// Router
+	fsRouter := appRouter.PathPrefix(publicPath).Subrouter()
+	// Resources
+	fsRouter.Handle(publicPath, fsServer)
+}
+
+// InitPublicFilesystems - Initialize public filesystem.
+func InitPublicFilesystems(publicDir string) {
+	// Paths
+	//fsPath := "/Users/adrian/go/src/github.com/adrianpk/fundacja/resources/public"
+	publicPath := "/"
+	// Fileserver
+	fsServer := http.FileServer(http.Dir(publicDir))
+	// Resources
+	appRouter.Handle(publicPath, fsServer)
 }
 
 // NewRouter - Creates a new mux.router.
@@ -96,6 +142,7 @@ func NewRouter() *mux.Router {
 }
 
 func home() func(http.ResponseWriter, *http.Request) {
+	logger.Debug("Home.....")
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "text/html")

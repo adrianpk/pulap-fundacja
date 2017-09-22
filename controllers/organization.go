@@ -24,229 +24,262 @@
 package controllers
 
 import (
-	"encoding/json"
+	htmlTemplate "html/template"
 
+	"github.com/arschles/go-bindata-html-template"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 
 	"net/http"
 	"net/url"
 	"path"
 
 	"github.com/adrianpk/fundacja/app"
+	"github.com/adrianpk/fundacja/bootstrap"
 	"github.com/adrianpk/fundacja/logger"
 	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/fundacja/repo"
 
 	_ "github.com/lib/pq" // Import pq without side effects
-
-	"github.com/adrianpk/fundacja/repo"
 )
 
-// GetOrganizations - Returns a collection containing all organizations.
+var (
+	organizationAssetsBase    string
+	organizationExtAssetsBase string
+	organizationTemplates     map[string]*template.Template
+	organizationExtTemplates  map[string]*htmlTemplate.Template
+	organizationIndex         = "/organizations"
+	organizationNew           = "/organizations/new"
+	organizationEdit          = "/organizations/edit/%s"
+	organizationShow          = "/organizations/%s"
+	organizationDelete        = "/organizations/delete/%s"
+)
+
+// InitializeOrganization - Initialize the controller
+func InitializeOrganization() {
+	if organizationTemplates == nil {
+		organizationTemplates = make(map[string]*template.Template)
+	}
+	if organizationExtTemplates == nil {
+		organizationExtTemplates = make(map[string]*htmlTemplate.Template)
+	}
+	parseOrganizationAssets()
+	parseOrganizationExtAssets()
+}
+
+// IndexOrganizations - Returns a collection containing all organizations.
 // Handler for HTTP Get - "/organizations"
-func GetOrganizations(w http.ResponseWriter, r *http.Request) {
+func IndexOrganizations(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("IndexOrganizations...")
 	// Get repo
 	organizationRepo, err := repo.MakeOrganizationRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntityNotFound, err, http.StatusInternalServerError)
+		showOrganizationError(w, r, indexView, layoutView, nil, app.ErrEntitySelect, warningAlert, err)
 		return
 	}
 	// Select
 	organizations, err := organizationRepo.GetAll()
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
-		return
-	}
-	// Marshal
-	j, err := json.Marshal(OrganizationsResource{Data: organizations})
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusInternalServerError)
+		showOrganizationError(w, r, indexView, layoutView, nil, app.ErrEntitySelect, warningAlert, err)
 		return
 	}
 	// Respond
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
+	pageModel := makePage(organizations, nil)
+	renderOrganizationTemplate(w, r, indexView, layoutView, pageModel)
+}
+
+// NewOrganization - Presents new organization form.
+// Handler for HTTP Get - "/organizations/new"
+func NewOrganization(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("NewOrganization...")
+	renderOrganizationTemplate(w, r, newView, layoutView, makePage(nil, nil))
 }
 
 // CreateOrganization - Creates a new Organization.
 // Handler for HTTP Post - "/organizations/create"
 func CreateOrganization(w http.ResponseWriter, r *http.Request) {
-	// Decode
-	var res OrganizationResource
-	err := json.NewDecoder(r.Body).Decode(&res)
+	logger.Debug("CreateOrganization...")
+	// Parse
+	err := r.ParseForm()
 	if err != nil {
-		app.ShowError(w, app.ErrRequestParsing, err, http.StatusInternalServerError)
+		showOrganizationError(w, r, newView, layoutView, nil, app.ErrEntityCreate, warningAlert, err)
 		return
 	}
-	organization := &res.Data
+	// Decode
+	var organization models.Organization
+	err = schema.NewDecoder().Decode(&organization, r.Form)
+	if err != nil {
+		showOrganizationError(w, r, newView, layoutView, organization, app.ErrEntityCreate, warningAlert, err)
+		return
+	}
+	// Get User
+	user, err := getUserByUsername(organization.UserUsername.String)
+	if err != nil {
+		showOrganizationError(w, r, newView, layoutView, organization, app.ErrEntityCreate, warningAlert, err)
+		return
+	}
+	organization.UserID = user.ID
+	organization.UserUsername = user.Username
 	// Get repo
 	organizationRepo, err := repo.MakeOrganizationRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntityCreate, err, http.StatusInternalServerError)
+		showOrganizationError(w, r, newView, layoutView, organization, app.ErrEntityCreate, warningAlert, err)
 		return
 	}
 	// Persist
-	organizationRepo.Create(organization)
+	organizationRepo.Create(&organization)
 	if err != nil {
-		app.ShowError(w, app.ErrEntityCreate, err, http.StatusInternalServerError)
-		return
-	}
-	// Marshal
-	j, err := json.Marshal(OrganizationResource{Data: *organization})
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusNoContent)
+		showOrganizationError(w, r, newView, layoutView, organization, app.ErrDataAccess, warningAlert, err)
 		return
 	}
 	// Respond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	w.Write(j)
+	redirectTo(w, r, organizationIndex, makePageAlert("Organization created", infoAlert))
 }
 
-// GetOrganization - Returns a single Organization by its id or name.
+// ShowOrganization - Returns a single Organization by its id or organizationname.
 // Handler for HTTP Get - "/organizations/{organization}"
-func GetOrganization(w http.ResponseWriter, r *http.Request) {
-	// Get ID
-	vars := mux.Vars(r)
-	key := vars["organization"]
-	if len(key) == 36 {
-		GetOrganizationByID(w, r)
-	} else {
-		GetOrganizationByName(w, r)
-	}
+func ShowOrganization(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("ShowOrganization...")
+	ShowOrganizationByID(w, r)
 }
 
-// GetOrganizationByID - Returns a single Organization by its id or name.
+// ShowOrganizationByID - Returns a single Organization by its id.
 // Handler for HTTP Get - "/organizations/{organization}"
-func GetOrganizationByID(w http.ResponseWriter, r *http.Request) {
+func ShowOrganizationByID(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("ShowOrganizationByID...")
 	// Get ID
 	vars := mux.Vars(r)
 	id := vars["organization"]
 	// Get repo
 	organizationRepo, err := repo.MakeOrganizationRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
+		redirectTo(w, r, organizationIndex, makePageAlert(app.ErrDataStore.Error(), warningAlert))
 		return
 	}
 	// Select
 	organization, err := organizationRepo.Get(id)
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
+		redirectTo(w, r, organizationIndex, makePageAlert(app.ErrDataAccess.Error(), warningAlert))
 		return
 	}
-	// Marshal
-	j, err := json.Marshal(organization)
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusInternalServerError)
-		return
-	}
-	// Repsond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(j)
+	renderOrganizationTemplate(w, r, showView, layoutView, makePage(organization, nil))
 }
 
-// GetOrganizationByName - Returns a single Organization by its name.
-// Handler for HTTP Get - "/organizations/{organization}"
-func GetOrganizationByName(w http.ResponseWriter, r *http.Request) {
-	// Get ID
-	vars := mux.Vars(r)
-	organizationName := vars["organization"]
-	// Get repo
-	organizationRepo, err := repo.MakeOrganizationRepository()
-	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
-		return
-	}
-	// Select
-	organization, err := organizationRepo.GetByName(organizationName)
-	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
-		return
-	}
-	// Marshal
-	j, err := json.Marshal(organization)
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusInternalServerError)
-		return
-	}
-	// Repond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(j)
-}
-
-// UpdateOrganization - Update an existing Organization.
-// Handler for HTTP Put - "/organizations/:id"
-func UpdateOrganization(w http.ResponseWriter, r *http.Request) {
+// EditOrganization - Presents edit organization form.
+// Handler for HTTP Get - "/organizations/edit"
+func EditOrganization(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("EditOrganization...")
 	// Get ID
 	vars := mux.Vars(r)
 	id := vars["organization"]
-	// Decode
-	var res OrganizationResource
-	err := json.NewDecoder(r.Body).Decode(&res)
+	// Get repo
+	organizationRepo, err := repo.MakeOrganizationRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrRequestParsing, err, http.StatusInternalServerError)
+		redirectTo(w, r, organizationIndex, makePageAlert(app.ErrDataStore.Error(), warningAlert))
 		return
 	}
-	organization := &res.Data
+	// Select
+	organization, err := organizationRepo.Get(id)
+	if err != nil {
+		redirectTo(w, r, organizationIndex, makePageAlert(app.ErrDataAccess.Error(), warningAlert))
+		return
+	}
+	renderOrganizationTemplate(w, r, editView, layoutView, makePage(organization, nil))
+	return
+}
+
+// UpdateOrganization - Update an existing Organization.
+// Handler for HTTP Put - "/organizations/{organization}"
+func UpdateOrganization(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("UpdateOrganization...")
+	// Get ID
+	vars := mux.Vars(r)
+	id := vars["organization"]
+	// Parse
+	err := r.ParseForm()
+	if err != nil {
+		showOrganizationError(w, r, signupView, layoutView, nil, app.ErrRegistration, warningAlert, err)
+		return
+	}
+	// Decode
+	var organization models.Organization
+	err = schema.NewDecoder().Decode(&organization, r.Form)
+	if err != nil {
+		showOrganizationError(w, r, editView, layoutView, organization, app.ErrRegistration, warningAlert, err)
+		return
+	}
 	organization.ID = models.ToNullsString(id)
 	// Get repo
 	organizationRepo, err := repo.MakeOrganizationRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusInternalServerError)
+		showOrganizationError(w, r, editView, layoutView, organization, app.ErrEntityUpdate, warningAlert, err)
 		return
 	}
 	// Check against current organization
 	currentOrganization, err := organizationRepo.Get(id)
 	if err != nil {
-		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusUnauthorized)
+		showOrganizationError(w, r, editView, layoutView, organization, app.ErrEntityUpdate, warningAlert, err)
 		return
 	}
 	// Avoid ID spoofing
 	err = verifyID(organization.IdentifiableModel, currentOrganization.IdentifiableModel)
 	if err != nil {
-		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusUnauthorized)
+		showOrganizationError(w, r, editView, layoutView, currentOrganization, app.ErrEntityUpdate, warningAlert, err)
 		return
 	}
 	// Update
-	err = organizationRepo.Update(organization)
+	err = organizationRepo.Update(&organization)
 	if err != nil {
-		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusInternalServerError)
-		return
-	}
-	// Marshal
-	j, err := json.Marshal(OrganizationResource{Data: *organization})
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusNoContent)
+		showOrganizationError(w, r, editView, layoutView, currentOrganization, app.ErrEntityUpdate, warningAlert, err)
 		return
 	}
 	// Respond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusNoContent)
-	w.Write(j)
+	redirectTo(w, r, organizationIndex, makePageAlert("Organization updated", warningAlert))
 }
 
-// DeleteOrganization - Deletes an existing Organization
-// Handler for HTTP Delete - "/organizations/{organization}"
-func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
+// InitDeleteOrganization - Show organization deletion page.
+// Handler for HTTP Get - "/organizations/init-delete/{organization}"
+func InitDeleteOrganization(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("InitDeleteOrganization...")
 	// Get ID
 	vars := mux.Vars(r)
 	id := vars["organization"]
 	// Get repo
 	organizationRepo, err := repo.MakeOrganizationRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
+		redirectTo(w, r, organizationIndex, makePageAlert(app.ErrDataStore.Error(), warningAlert))
+		return
+	}
+	// Select
+	organization, err := organizationRepo.Get(id)
+	if err != nil {
+		redirectTo(w, r, organizationIndex, makePageAlert(app.ErrDataAccess.Error(), warningAlert))
+		return
+	}
+	renderOrganizationTemplate(w, r, deleteView, layoutView, makePage(organization, nil))
+}
+
+// DeleteOrganization - Deletes an existing Organization
+// Handler for HTTP Delete - "/organizations/{id}"
+func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("DeleteOrganization...")
+	// Get ID
+	vars := mux.Vars(r)
+	id := vars["organization"]
+	// Get repo
+	organizationRepo, err := repo.MakeOrganizationRepository()
+	if err != nil {
+		showOrganizationError(w, r, indexView, layoutView, nil, app.ErrEntitySelect, warningAlert, err)
 		return
 	}
 	// Delete
 	err = organizationRepo.Delete(id)
 	if err != nil {
-		app.ShowError(w, app.ErrEntityDelete, err, http.StatusInternalServerError)
+		showOrganizationError(w, r, indexView, layoutView, nil, app.ErrEntityDelete, warningAlert, err)
 		return
 	}
 	// Respond
-	w.WriteHeader(http.StatusNoContent)
+	redirectTo(w, r, organizationIndex, makePageAlert("Organization updated", warningAlert))
 }
 
 func organizationIDfromURL(r *http.Request) string {
@@ -257,10 +290,51 @@ func organizationIDfromURL(r *http.Request) string {
 	return id
 }
 
-func organizationNameFromURL(r *http.Request) string {
+func organizationnameFromURL(r *http.Request) string {
 	u, _ := url.Parse(r.URL.Path)
 	dir := path.Dir(u.Path)
-	organizationName := path.Base(dir)
-	logger.Debugf("OrganizationName in url is %s", organizationName)
-	return organizationName
+	organizationname := path.Base(dir)
+	logger.Debugf("OrganizationName in url is %s", organizationname)
+	return organizationname
+}
+
+func parseOrganizationAssets() {
+	//logger.Debug("Parsing organization assets...")
+	assetNames := []string{indexView, newView, showView, editView, deleteView}
+	parseAssets(&organizationAssetsBase, "layouts", "organization", layoutView, assetNames, organizationTemplates)
+}
+
+func parseOrganizationExtAssets() {
+	assetNames := []string{indexView, newView, showView, editView, deleteView}
+	parseExtAssets(&organizationExtAssetsBase, "layouts", "organization", layoutView, assetNames, organizationExtTemplates)
+}
+
+func renderOrganizationTemplate(w http.ResponseWriter, r *http.Request, groupName string, name string, page *Page) {
+	if useExtTemplates {
+		renderExtOrganizationTemplate(w, r, groupName, name, page)
+		return
+	}
+	renderIntOrganizationTemplate(w, r, groupName, name, page)
+}
+
+// Render templates for the given name, template definition and data object
+func renderIntOrganizationTemplate(w http.ResponseWriter, r *http.Request, groupName string, name string, page *Page) {
+	renderTemplate(w, r, organizationAssetsBase, groupName, name, organizationTemplates, page)
+}
+
+// Render templates for the given name, template definition and data object
+func renderExtOrganizationTemplate(w http.ResponseWriter, r *http.Request, groupName string, name string, page *Page) {
+	//logger.Debugf("Autoreload: %t", bootstrap.AppConfig.IsAutoreloadOn())
+	if bootstrap.AppConfig.IsAutoreloadOn() {
+		logger.Debug("Reloading templates.")
+		organizationExtTemplates = make(map[string]*htmlTemplate.Template)
+		parseOrganizationExtAssets()
+	}
+	renderExtTemplate(w, r, organizationExtAssetsBase, groupName, name, organizationExtTemplates, page)
+}
+
+func showOrganizationError(w http.ResponseWriter, r *http.Request, page string, layout string, model interface{}, err error, alertKind string, cause error) {
+	logger.Dump(cause)
+	pageModel := makePage(model, makePageAlert(err.Error(), alertKind))
+	renderOrganizationTemplate(w, r, page, layoutView, pageModel)
 }

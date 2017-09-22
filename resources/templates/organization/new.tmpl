@@ -1,0 +1,52 @@
+${define "head"}
+${$organization := .Model}
+<title>New User</title>
+${end}
+
+${define "body"}
+${$organization := .Model}
+<div id="app" class="container">
+  <div class="mt-3">
+    <h1>New user</h1>
+  </div>
+  <div>
+    <p>
+			<a href="/users" >Users</a>
+		</p>
+    <form id="new-form" action="/users" method="post" class="form-group cmxform">
+      <fieldset>
+        <div class="form-group">
+          <span>
+            <label for="user-id">Name</label>
+            <small id="user-id-error" class="text-danger container-error"></small>
+          </span>
+          <input id="user-id" type="text" class="form-control fnd-form-control" name="user-id" value="${$organization.UserID.String}" placeholder="">
+        </div>
+
+        <div class="form-group">
+          <span>
+            <label for="name">Name</label>
+            <small id="name-error" class="text-danger container-error"></small>
+          </span>
+          <input id="name" type="text" class="form-control fnd-form-control" name="name" value="${$organization.Name.String}" placeholder="">
+        </div>
+
+        <div class="form-group">
+          <span>
+            <label for="description">Description</label>
+            <small id="descriptionError" class="text-danger container-error"></small>
+          </span>
+          <input id="description" type="textarea" class="form-control fnd-form-control" name="description" value="${$organization.Description.String}">
+        </div>
+
+        <div class="form-group">
+          <label class="fnd-checkbox">
+              <input id="is-active" type="checkbox" id="is-active" name="is-active" class="form-control" value="true" ${if $organization.IsActive.Bool}checked${end}>
+              <span>Active</span>
+          </label>
+        </div>
+      </fieldset>      <p><input type="submit" value="Add" class="btn btn-xs btn-outline-primary"/></p>
+    </form>
+  </div>
+</div>
+${end}

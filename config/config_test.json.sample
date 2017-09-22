@@ -1,10 +1,13 @@
 {
-  "Server"  : "0.0.0.0:8080",
-  "DBHost"  : "127.0.0.1",
-  "Database": "dbname-test",
-  "DBUser"  : "dbuser",
-  "DBPass"	: "dbpass",
-  "DBSSL"   : "disable",
-  "LogLevel": 1,
-  "LogFile" : "/tmp/logs.txt"
+  "Server"       : "0.0.0.0:8080",
+  "DBHost"       : "127.0.0.1",
+  "Database"     : "dbname-test",
+  "DBUser"       : "dbuser",
+  "DBPass"	     : "dbpass",
+  "DBSSL"        : "disable",
+  "ResourcesDir" : "/home/user/apps/fundacja_test/resources",
+  "PublicDir"    : "/home/user/public/fundacja_test",
+  "LogFile"      : "/home/user/tmp/fundacja_test.log",
+  "LogLevel"     : 1,
+  "Autoreload"   : false
 }

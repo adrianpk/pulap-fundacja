@@ -1,0 +1,40 @@
+${define "head"}<title>Login</title>${end}
+${define "body"}
+<div id="app" class="container">
+	<div>
+		<div class="container">
+			<form id="login-form" class="form-signin" action="/login" method="post" role="form">
+				<h2 class="form-signin-heading">Login</h2>
+				<div>
+					<label>
+						<a href="/signup" >Sign Up</a>
+					</label>
+				</div>
+				<!-- Username field-->
+				<div class="form-group">
+          <input id="username" type="text" class="form-control fnd-form-control" name="username" placeholder="Username">
+					<span>
+            <small id="username-error" class="text-danger container-error"></small>
+          </span>
+        </div>
+			  <!-- Password field-->
+				<div class="form-group">
+          <input id="password" type="password" class="form-control fnd-form-control" name="password" placeholder="Password">
+					<span>
+						<small id="password-error" class="text-danger container-error"></small>
+					</span>
+        </div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="remember" name="remember" value="true"> Remember me -
+					</label>
+					<label>
+						<a href="/forgot-password" >Forgot pasword?</a>
+					</label>
+				</div>
+				<button type="submit" class="btn btn-lg btn-primary btn-block">Log in</button>
+			</form>
+		</div>
+	</div>
+</div>
+${end}

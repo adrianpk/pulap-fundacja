@@ -24,14 +24,15 @@
 package bootstrap
 
 import (
-	"github.com/adrianpk/fundacja/logger"
 	"os"
 	"path"
+
+	"github.com/adrianpk/fundacja/logger"
 )
 
 // SetLogLevel sets the logging level preference
 func initLogger() {
-	setLogLevel(AppConfig.LogFile, AppConfig.LogLevel)
+	setLogLevel(AppConfig.GetLogFile(), AppConfig.GetLogLevel())
 }
 
 // SetLogLevel sets the logging level preference

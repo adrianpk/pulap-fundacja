@@ -44,7 +44,7 @@ func (c *Context) Close() {
 
 // DbCollection returns mgo.collection for the given name
 func (c *Context) DbCollection(name string) *mgo.Collection {
-	return c.MongoSession.DB(bootstrap.AppConfig.Database).C(name)
+	return c.MongoSession.DB(bootstrap.AppConfig.GetDBConnParamenters()["Database"]).C(name)
 }
 
 // NewContext creates a new Context object for each HTTP request

@@ -26,6 +26,7 @@
   name: Organization
   description: Organization description
   geolocation: 0101000020E610000000000000000000000000000000000000
+  user_username: admin
   user_id: 5958b185-8150-4aae-b53f-0c44771ddec5
   created_by: 5958b185-8150-4aae-b53f-0c44771ddec5
   is_active: true
@@ -39,6 +40,7 @@
   name: Organization2.
   description: Organization2 description
   geolocation: 0101000020E610000000000000000000000000000000000000
+  user_username: user
   user_id: 3c05e701-b495-4443-b454-2c37e2ecccdf
   created_by: 3c05e701-b495-4443-b454-2c37e2ecccdf
   is_active: true

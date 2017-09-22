@@ -23,11 +23,16 @@
 
 package main
 
+//go:generate rm -rf views/views.go
+//go:generate go-bindata -pkg views -o views/views.go resources/templates/...
+//g.:g....... go-bindata -pkg views -o views/public.go resources/public/...
+
 import (
 	"net/http"
 	"os"
 
 	"github.com/adrianpk/fundacja/bootstrap"
+	"github.com/adrianpk/fundacja/controllers"
 	"github.com/adrianpk/fundacja/handler"
 	"github.com/adrianpk/fundacja/logger"
 )
@@ -35,12 +40,17 @@ import (
 func main() {
 	bootstrap.SetBootParameters(mockBootParameters())
 	bootstrap.Boot()
-	handler := handler.AppHandler()
+	controllers.Initialize()
+	handler := handler.AppHandler(bootstrap.AppConfig)
 	server := &http.Server{
-		Addr:    bootstrap.AppConfig.Server,
+		Addr:    bootstrap.AppConfig.GetServer(),
 		Handler: handler,
 	}
-	server.ListenAndServe()
+	err := server.ListenAndServe()
+	if err != nil {
+		logger.Debugf("Error: %s", err)
+		panic(err)
+	}
 	logger.Debug("Listening...")
 }
 

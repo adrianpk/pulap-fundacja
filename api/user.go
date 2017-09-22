@@ -292,7 +292,6 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	var res UserResource
 	err := json.NewDecoder(r.Body).Decode(&res)
 	if err != nil {
-		logger.Debug("1")
 		app.ShowError(w, app.ErrRequestParsing, err, http.StatusInternalServerError)
 		return
 	}
@@ -301,35 +300,30 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// Get repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		logger.Debug("2")
 		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusInternalServerError)
 		return
 	}
 	// Check against current user
 	currentUser, err := userRepo.Get(id)
 	if err != nil {
-		logger.Debug("3")
 		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusUnauthorized)
 		return
 	}
 	// Avoid ID spoofing
 	err = verifyID(user.IdentifiableModel, currentUser.IdentifiableModel)
 	if err != nil {
-		logger.Debug("4")
 		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusUnauthorized)
 		return
 	}
 	// Update
 	err = userRepo.Update(user)
 	if err != nil {
-		logger.Debug("5")
 		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusInternalServerError)
 		return
 	}
 	// Marshal
 	j, err := json.Marshal(UserResource{Data: *user})
 	if err != nil {
-		logger.Debug("6")
 		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusNoContent)
 		return
 	}

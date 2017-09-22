@@ -25,6 +25,7 @@ CREATE TABLE permissions
 (id UUID PRIMARY KEY,
  name VARCHAR(32),
  description VARCHAR(255) NULL,
+ organization_name VARCHAR(32),
  organization_id UUID,
  created_by UUID NULL,
  is_active BOOLEAN,

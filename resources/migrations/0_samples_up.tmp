@@ -1,5 +1,5 @@
 CREATE TABLE samples
-	 id VARCHAR(36) PRIMARY KEY UNIQUE,
+	 id UUID PRIMARY KEY UNIQUE,
 	 name VARCHAR(64) UNIQUE,
 	 description TEXT,
 	 user_id VARCHAR(64),
@@ -18,4 +18,3 @@ ALTER TABLE Samples
 	FOREIGN KEY (user_id)
 	REFERENCES samples
 	ON DELETE CASCADE;
-

@@ -28,8 +28,12 @@ import (
 )
 
 var (
-	// ErrDbConnection - Cannot connect to datastore.
-	ErrDbConnection = errors.New("Cannot connect to datastore")
+	// ErrDbConnection - Data store error.
+	ErrDbConnection = errors.New("Data store error")
+	// ErrDataStore - Data store error.
+	ErrDataStore = errors.New("Data store error")
+	// ErrDataAccess - Data access error.
+	ErrDataAccess = errors.New("Data access error")
 	// ErrTokenExpired - Access Token is expired.
 	ErrTokenExpired = errors.New("Access Token is expired")
 	// ErrTokenParsing - Error while parsing the Access Token
@@ -56,6 +60,8 @@ var (
 	ErrLoginDenied = errors.New("Login denied")
 	// ErrLoginTokenCreate - Error while generating the access token
 	ErrLoginTokenCreate = errors.New("Error while generating the access token")
+	// ErrLoginSessionCreate - Error while generating session.
+	ErrLoginSessionCreate = errors.New("Error while generating session")
 	// ErrNotLoggedIn - Not logged in.
 	ErrNotLoggedIn = errors.New("Not logged in")
 	// ErrUnauthorized - Unauthorized
@@ -66,8 +72,8 @@ var (
 	ErrEntityInvalidData = errors.New("Entity invalid data")
 	// ErrEntityNotFound - Entity not found.
 	ErrEntityNotFound = errors.New("Entity not found")
-	// ErrEntitySelect - Cannot select user.
-	ErrEntitySelect = errors.New("Cannot select user/s")
+	// ErrEntitySelect - Cannot select entities.
+	ErrEntitySelect = errors.New("Cannot select entities")
 	// ErrEntityCreate - Cannot create user.
 	ErrEntityCreate = errors.New("Cannot create entity")
 	// ErrEntityUpdate - Cannot update model.
@@ -76,6 +82,14 @@ var (
 	ErrEntityDelete = errors.New("Cannot delete entity")
 	// ErrEntitySetProperty - Cannot set property.
 	ErrEntitySetProperty = errors.New("Cannot set property")
+	// ErrSearch - Search error.
+	ErrSearch = errors.New("Search error")
+	// ErrRequestProcessing - Cannot process your request.
+	ErrRequestProcessing = errors.New("Cannot process your request")
 	// ErrImageProcessing - Error processing image.
 	ErrImageProcessing = errors.New("Error processing image")
+	// ErrPageNotFoud - Error page not found.
+	ErrPageNotFoud = errors.New("Page not found")
+	// ErrTemplateExecution - Error template execution.
+	ErrTemplateExecution = errors.New("Error executing template")
 )

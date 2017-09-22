@@ -32,16 +32,6 @@ import (
 	"path"
 )
 
-type (
-	configuration struct {
-		Server                                  string
-		DBHost, Database, DBUser, DBPass, DBSSL string
-		BaseDir                                 string
-		LogLevel                                int
-		LogFile                                 string
-	}
-)
-
 // AppConfig holds the configuration values from config.json file
 var AppConfig configuration
 
@@ -63,7 +53,7 @@ func loadAppConfig(env string) {
 	decoder := json.NewDecoder(file)
 	AppConfig = configuration{}
 	err = decoder.Decode(&AppConfig)
-	//log.Printf("Config: %v", AppConfig)
+	// log.Printf("Config: %v", AppConfig)
 	if err != nil {
 		log.Fatalf("[Fundacja]: %s\n", err)
 	}

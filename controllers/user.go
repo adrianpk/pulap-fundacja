@@ -24,9 +24,11 @@
 package controllers
 
 import (
-	"encoding/json"
+	htmlTemplate "html/template"
 
+	"github.com/arschles/go-bindata-html-template"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 
 	"net/http"
 	"net/url"
@@ -54,311 +56,363 @@ import (
 // delete "users/{user}"
 // # http DELETE method.  In this instance, used to delete a user.
 
+const (
+	rememberField = "remember"
+)
+
+var (
+	userAssetsBase    string //resources/templates/user
+	userExtAssetsBase string
+	userTemplates     map[string]*template.Template
+	userExtTemplates  map[string]*htmlTemplate.Template
+	userIndex         = "/users"
+	userNew           = "/users/new"
+	userEdit          = "/users/edit/%s"
+	userShow          = "/users/%s"
+	userDelete        = "/users/delete/%s"
+)
+
+// InitializeUser - Initialize the controller
+func InitializeUser() {
+	if userTemplates == nil {
+		userTemplates = make(map[string]*template.Template)
+	}
+	if userExtTemplates == nil {
+		userExtTemplates = make(map[string]*htmlTemplate.Template)
+	}
+	parseUserAssets()
+	parseUserExtAssets()
+}
+
+// ShowSignUp - Shows SignUp form.
+// Handler for HTTP Post - "/users/signup"
+func ShowSignUp(w http.ResponseWriter, r *http.Request) {
+	pageModel := makePage(nil, nil)
+	renderUserTemplate(w, r, signupView, layoutView, pageModel)
+}
+
 // SignUp - SignUp a new User.
 // Handler for HTTP Post - "/users/signup"
 func SignUp(w http.ResponseWriter, r *http.Request) {
-	// Decode
-	var res UserResource
-	err := json.NewDecoder(r.Body).Decode(&res)
+	logger.Debug("SignUp...")
+	// Parse
+	err := r.ParseForm()
 	if err != nil {
-		app.ShowError(w, app.ErrRequestParsing, err, http.StatusInternalServerError)
+		showUserError(w, r, signupView, layoutView, nil, app.ErrRegistration, warningAlert, err)
 		return
 	}
-	user := &res.Data
+	// Decode
+	var user models.User
+	err = schema.NewDecoder().Decode(&user, r.Form)
+	if err != nil {
+		showUserError(w, r, signupView, layoutView, nil, app.ErrRegistration, warningAlert, err)
+		return
+	}
 	// Get Repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrRegistration, err, http.StatusInternalServerError)
+		showUserError(w, r, signupView, layoutView, nil, app.ErrRegistration, warningAlert, err)
 		return
 	}
 	// Persist
 	user.SetID()
 	user.CreatedBy = user.ID
-	err = userRepo.Create(user)
+	err = userRepo.Create(&user)
 	if err != nil {
-		app.ShowError(w, app.ErrRegistration, err, http.StatusInternalServerError)
+		user.ClearPassword()
+		showUserError(w, r, signupView, layoutView, user, app.ErrRegistration, warningAlert, err)
 		return
 	}
-	// Marshal
+	// Clear password field
 	user.ClearPassword()
-	j, err := json.Marshal(UserResource{Data: *user})
-	if err != nil {
-		logger.Dump(err)
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusInternalServerError)
-		return
-	}
 	// Respond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	w.Write(j)
+	// redirectTo(w, r, userIndex, nil)
+	renderUserTemplate(w, r, editView, layoutView, makePage(user, nil))
+}
+
+// ShowLogin - Shows SignUp form.
+// Handler for HTTP Post - "/users/signup"
+func ShowLogin(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("ShowLogin...")
+	pageModel := makePage(models.User{}, nil)
+	renderUserTemplate(w, r, loginView, layoutView, pageModel)
 }
 
 // Login - Authenticates the HTTP request with username and apssword
 // Handler for HTTP Post - "/users/login"
 func Login(w http.ResponseWriter, r *http.Request) {
-	var res LoginResource
-	var token string
-	// Decode
-	err := json.NewDecoder(r.Body).Decode(&res)
+	logger.Debug("Login...")
+	debugRequest(r)
+	err := r.ParseForm()
 	if err != nil {
-		app.ShowError(w, app.ErrRequestParsing, err, http.StatusInternalServerError)
+		showUserError(w, r, loginView, layoutView, nil, app.ErrLogin, warningAlert, err)
 		return
 	}
-	loginModel := res.Data
-	loginUser := models.User{
-		Username: models.ToNullsString(loginModel.Username),
-		Email:    models.ToNullsString(loginModel.Email),
-		Password: loginModel.Password,
+	// Decode
+	var toLogin models.User
+	err = getFormDecoder(true).Decode(&toLogin, r.Form)
+	if err != nil {
+		showUserError(w, r, loginView, layoutView, toLogin, app.ErrRequestParsing, warningAlert, err)
+		return
 	}
-	// Get repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrLogin, err, http.StatusInternalServerError)
+		showUserError(w, r, loginView, layoutView, toLogin, app.ErrLogin, warningAlert, err)
 		return
 	}
 	// Authenticate the logged in user
-	user, err := userRepo.Login(loginUser)
+	user, err := userRepo.Login(toLogin)
 	if err != nil {
-		app.ShowError(w, app.ErrLoginDenied, err, http.StatusUnauthorized)
+		showUserError(w, r, loginView, layoutView, toLogin, app.ErrLoginDenied, warningAlert, err)
 		return
 	}
-	// Generate JWT token
-	token, err = bootstrap.GenerateJWT(user.ID.String, user.Username.String, "member")
+	toLogin.PasswordHash = ""
+	// Create session
+	err = setSession(w, r, user, inputIsTrue(r, rememberField))
 	if err != nil {
-		app.ShowError(w, app.ErrLoginTokenCreate, err, http.StatusInternalServerError)
+		showUserError(w, r, loginView, layoutView, toLogin, app.ErrLoginSessionCreate, warningAlert, err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	// Clean-up the hashpassword to eliminate it from response JSON
-	user.PasswordHash = ""
-	authUser := AuthUserModel{
-		User:  user,
-		Token: token,
-	}
-	// Marshal
-	j, err := json.Marshal(AuthUserResource{Data: authUser})
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusInternalServerError)
-		return
-	}
-	// Respond
-	w.WriteHeader(http.StatusOK)
-	w.Write(j)
+	// redirectTo(w, r, userIndex, nil)
+	renderUserTemplate(w, r, editView, layoutView, makePage(user, nil))
 }
 
-// GetUsers - Returns a collection containing all users.
+// IndexUsers - Returns a collection containing all users.
 // Handler for HTTP Get - "/users"
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+func IndexUsers(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("IndexUsers...")
 	// Get repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntityNotFound, err, http.StatusInternalServerError)
+		showUserError(w, r, indexView, layoutView, nil, app.ErrEntitySelect, warningAlert, err)
 		return
 	}
 	// Select
 	users, err := userRepo.GetAll()
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
-		return
-	}
-	// Marshal
-	j, err := json.Marshal(UsersResource{Data: users})
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusInternalServerError)
+		showUserError(w, r, indexView, layoutView, nil, app.ErrEntitySelect, warningAlert, err)
 		return
 	}
 	// Respond
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
+	pageModel := makePage(users, nil)
+	renderUserTemplate(w, r, indexView, layoutView, pageModel)
+}
+
+// NewUser - Presents new user form.
+// Handler for HTTP Get - "/users/new"
+func NewUser(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("NewUser...")
+	renderUserTemplate(w, r, newView, layoutView, makePage(nil, nil))
 }
 
 // CreateUser - Creates a new User.
 // Handler for HTTP Post - "/users/create"
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	// Decode
-	var res UserResource
-	err := json.NewDecoder(r.Body).Decode(&res)
+	logger.Debug("CreateUser...")
+	// Parse
+	err := r.ParseForm()
 	if err != nil {
-		app.ShowError(w, app.ErrRequestParsing, err, http.StatusInternalServerError)
+		showUserError(w, r, newView, layoutView, nil, app.ErrEntityCreate, warningAlert, err)
 		return
 	}
-	user := &res.Data
+	// Decode
+	var user models.User
+	err = schema.NewDecoder().Decode(&user, r.Form)
+	if err != nil {
+		showUserError(w, r, newView, layoutView, user, app.ErrEntityCreate, warningAlert, err)
+		return
+	}
 	// Get repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntityCreate, err, http.StatusInternalServerError)
+		showUserError(w, r, newView, layoutView, user, app.ErrEntityCreate, warningAlert, err)
 		return
 	}
 	// Persist
-	userRepo.Create(user)
-	if err != nil {
-		app.ShowError(w, app.ErrEntityCreate, err, http.StatusInternalServerError)
-		return
-	}
-	// Marshal
+	userRepo.Create(&user)
 	user.ClearPassword()
-	j, err := json.Marshal(UserResource{Data: *user})
 	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusNoContent)
+		showUserError(w, r, newView, layoutView, user, app.ErrDataAccess, warningAlert, err)
 		return
 	}
 	// Respond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	w.Write(j)
+	redirectTo(w, r, userIndex, makePageAlert("User created", infoAlert))
 }
 
-// GetUser - Returns a single User by its id or username.
+// ShowUser - Returns a single User by its id or username.
 // Handler for HTTP Get - "/users/{user}"
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func ShowUser(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("ShowUser...")
 	// Get ID
 	vars := mux.Vars(r)
 	key := vars["user"]
 	if isUUID(key) {
-		GetUserByID(w, r)
+		ShowUserByID(w, r)
 	} else {
-		GetUserByUsername(w, r)
+		ShowUserByUsername(w, r)
 	}
 }
 
-// GetUserByID - Returns a single User by its id.
+// ShowUserByID - Returns a single User by its id.
 // Handler for HTTP Get - "/users/{user}"
-func GetUserByID(w http.ResponseWriter, r *http.Request) {
+func ShowUserByID(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("ShowUserByID...")
 	// Get ID
 	vars := mux.Vars(r)
 	id := vars["user"]
 	// Get repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
+		redirectTo(w, r, userIndex, makePageAlert(app.ErrDataStore.Error(), warningAlert))
 		return
 	}
 	// Select
 	user, err := userRepo.Get(id)
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
+		redirectTo(w, r, userIndex, makePageAlert(app.ErrDataAccess.Error(), warningAlert))
 		return
 	}
-	// Marshal
-	j, err := json.Marshal(user)
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusInternalServerError)
-		return
-	}
-	// Repsond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(j)
+	renderUserTemplate(w, r, showView, layoutView, makePage(user, nil))
 }
 
-// GetUserByUsername - Returns a single User by its username.
+// ShowUserByUsername - Returns a single User by its username.
 // Handler for HTTP Get - "/users/{user}"
-func GetUserByUsername(w http.ResponseWriter, r *http.Request) {
+func ShowUserByUsername(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("ShowUserByUsername...")
 	// Get ID
 	vars := mux.Vars(r)
 	username := vars["user"]
 	// Get repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
+		redirectTo(w, r, userIndex, makePageAlert(app.ErrDataStore.Error(), warningAlert))
 		return
 	}
 	// Select
 	user, err := userRepo.GetByUsername(username)
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
-		return
-	}
-	// Marshal
-	j, err := json.Marshal(user)
-	if err != nil {
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusInternalServerError)
+		redirectTo(w, r, userIndex, makePageAlert(app.ErrDataAccess.Error(), warningAlert))
 		return
 	}
 	// Repond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(j)
+	renderUserTemplate(w, r, showView, layoutView, makePage(user, nil))
+}
+
+// EditUser - Presents edit user form.
+// Handler for HTTP Get - "/users/edit"
+func EditUser(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("EditUser...")
+	// Get ID
+	vars := mux.Vars(r)
+	id := vars["user"]
+	// Get repo
+	userRepo, err := repo.MakeUserRepository()
+	if err != nil {
+		redirectTo(w, r, userIndex, makePageAlert(app.ErrDataStore.Error(), warningAlert))
+		return
+	}
+	// Select
+	user, err := userRepo.Get(id)
+	if err != nil {
+		redirectTo(w, r, userIndex, makePageAlert(app.ErrDataAccess.Error(), warningAlert))
+		return
+	}
+	renderUserTemplate(w, r, editView, layoutView, makePage(user, nil))
+	return
 }
 
 // UpdateUser - Update an existing User.
 // Handler for HTTP Put - "/users/{user}"
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("UpdateUser...")
 	// Get ID
 	vars := mux.Vars(r)
 	id := vars["user"]
-	// Decode
-	var res UserResource
-	err := json.NewDecoder(r.Body).Decode(&res)
+	// Parse
+	err := r.ParseForm()
 	if err != nil {
-		logger.Debug("1")
-		app.ShowError(w, app.ErrRequestParsing, err, http.StatusInternalServerError)
+		showUserError(w, r, signupView, layoutView, nil, app.ErrRegistration, warningAlert, err)
 		return
 	}
-	user := &res.Data
+	// Decode
+	var user models.User
+	err = schema.NewDecoder().Decode(&user, r.Form)
+	if err != nil {
+		showUserError(w, r, editView, layoutView, user, app.ErrRegistration, warningAlert, err)
+		return
+	}
 	user.ID = models.ToNullsString(id)
 	// Get repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		logger.Debug("2")
-		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusInternalServerError)
+		showUserError(w, r, editView, layoutView, user, app.ErrEntityUpdate, warningAlert, err)
 		return
 	}
 	// Check against current user
 	currentUser, err := userRepo.Get(id)
 	if err != nil {
-		logger.Debug("3")
-		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusUnauthorized)
+		showUserError(w, r, editView, layoutView, user, app.ErrEntityUpdate, warningAlert, err)
 		return
 	}
 	// Avoid ID spoofing
 	err = verifyID(user.IdentifiableModel, currentUser.IdentifiableModel)
 	if err != nil {
-		logger.Debug("4")
-		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusUnauthorized)
+		showUserError(w, r, editView, layoutView, currentUser, app.ErrEntityUpdate, warningAlert, err)
 		return
 	}
 	// Update
-	err = userRepo.Update(user)
+	err = userRepo.Update(&user)
 	if err != nil {
-		logger.Debug("5")
-		app.ShowError(w, app.ErrEntityUpdate, err, http.StatusInternalServerError)
-		return
-	}
-	// Marshal
-	j, err := json.Marshal(UserResource{Data: *user})
-	if err != nil {
-		logger.Debug("6")
-		app.ShowError(w, app.ErrResponseMarshalling, err, http.StatusNoContent)
+		showUserError(w, r, editView, layoutView, currentUser, app.ErrEntityUpdate, warningAlert, err)
 		return
 	}
 	// Respond
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusNoContent)
-	w.Write(j)
+	redirectTo(w, r, userIndex, makePageAlert("User updated", warningAlert))
 }
 
-// DeleteUser - Deletes an existing User
-// Handler for HTTP Delete - "/users/{id}"
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
+// InitDeleteUser - Show user deletion page.
+// Handler for HTTP Get - "/users/init-delete/{user}"
+func InitDeleteUser(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("InitDeleteUser...")
 	// Get ID
 	vars := mux.Vars(r)
 	id := vars["user"]
 	// Get repo
 	userRepo, err := repo.MakeUserRepository()
 	if err != nil {
-		app.ShowError(w, app.ErrEntitySelect, err, http.StatusInternalServerError)
+		redirectTo(w, r, userIndex, makePageAlert(app.ErrDataStore.Error(), warningAlert))
+		return
+	}
+	// Select
+	user, err := userRepo.Get(id)
+	if err != nil {
+		redirectTo(w, r, userIndex, makePageAlert(app.ErrDataAccess.Error(), warningAlert))
+		return
+	}
+	renderUserTemplate(w, r, deleteView, layoutView, makePage(user, nil))
+}
+
+// DeleteUser - Deletes an existing User
+// Handler for HTTP Delete - "/users/{id}"
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("DeleteUser...")
+	// Get ID
+	vars := mux.Vars(r)
+	id := vars["user"]
+	// Get repo
+	userRepo, err := repo.MakeUserRepository()
+	if err != nil {
+		showUserError(w, r, indexView, layoutView, nil, app.ErrEntitySelect, warningAlert, err)
 		return
 	}
 	// Delete
 	err = userRepo.Delete(id)
 	if err != nil {
-		app.ShowError(w, app.ErrEntityDelete, err, http.StatusInternalServerError)
+		showUserError(w, r, indexView, layoutView, nil, app.ErrEntityDelete, warningAlert, err)
 		return
 	}
 	// Respond
-	w.WriteHeader(http.StatusNoContent)
+	redirectTo(w, r, userIndex, makePageAlert("User updated", warningAlert))
 }
 
 func userIDfromURL(r *http.Request) string {
@@ -375,4 +429,45 @@ func usernameFromURL(r *http.Request) string {
 	username := path.Base(dir)
 	logger.Debugf("Username in url is %s", username)
 	return username
+}
+
+func parseUserAssets() {
+	//logger.Debug("Parsing user assets...")
+	assetNames := []string{signupView, loginView, indexView, newView, showView, editView, deleteView}
+	parseAssets(&userAssetsBase, "layouts", "user", layoutView, assetNames, userTemplates)
+}
+
+func parseUserExtAssets() {
+	assetNames := []string{signupView, loginView, indexView, newView, showView, editView, deleteView}
+	parseExtAssets(&userExtAssetsBase, "layouts", "user", layoutView, assetNames, userExtTemplates)
+}
+
+func renderUserTemplate(w http.ResponseWriter, r *http.Request, groupName string, name string, page *Page) {
+	if useExtTemplates {
+		renderExtUserTemplate(w, r, groupName, name, page)
+		return
+	}
+	renderIntUserTemplate(w, r, groupName, name, page)
+}
+
+// Render templates for the given name, template definition and data object
+func renderIntUserTemplate(w http.ResponseWriter, r *http.Request, groupName string, name string, page *Page) {
+	renderTemplate(w, r, userAssetsBase, groupName, name, userTemplates, page)
+}
+
+// Render templates for the given name, template definition and data object
+func renderExtUserTemplate(w http.ResponseWriter, r *http.Request, groupName string, name string, page *Page) {
+	//logger.Debugf("Autoreload: %t", bootstrap.AppConfig.IsAutoreloadOn())
+	if bootstrap.AppConfig.IsAutoreloadOn() {
+		logger.Debug("Reloading templates.")
+		userExtTemplates = make(map[string]*htmlTemplate.Template)
+		parseUserExtAssets()
+	}
+	renderExtTemplate(w, r, userExtAssetsBase, groupName, name, userExtTemplates, page)
+}
+
+func showUserError(w http.ResponseWriter, r *http.Request, page string, layout string, model interface{}, err error, alertKind string, cause error) {
+	logger.Dump(cause)
+	pageModel := makePage(model, makePageAlert(err.Error(), alertKind))
+	renderUserTemplate(w, r, page, layoutView, pageModel)
 }

@@ -27,7 +27,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -60,28 +59,9 @@ func BootParameters() map[string]string {
 	// Migrations: "m", "r", "n" - migrate, rollback, none
 	params["env"] = "test"
 	params["app_home"] = os.Getenv("FUNDACJA_HOME")
-	params["migration"] = "n"
+	params["migration"] = "m"
 	return params
 }
-
-type (
-	testBootstrap struct {
-		Server                                  string
-		DBHost, Database, DBUser, DBPass, DBSSL string
-		LogLevel                                int
-		LogFile                                 string
-		BaseDir                                 string
-		FixturesDir                             string
-		DBConfig                                string
-		DBInstance                              *sql.DB
-		Fixtures                                *testfixtures.Context
-		ServerInstance                          *httptest.Server
-		Reader                                  io.Reader //Ignore this for now
-		APIPath                                 string
-		APIVersion                              string
-		APIServerURL                            string
-	}
-)
 
 // Reads config.json and decode into TestBootstrap
 func init() {
@@ -104,7 +84,7 @@ func init() {
 	TestBootstrap.BaseDir = baseTest
 	TestBootstrap.FixturesDir = path.Join(baseTest, fixturesDir)
 	TestBootstrap.DBConfig = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s", TestBootstrap.DBUser, TestBootstrap.DBPass, TestBootstrap.Database, TestBootstrap.DBSSL)
-	TestBootstrap.ServerInstance = httptest.NewServer(handler.AppHandler())
+	TestBootstrap.ServerInstance = httptest.NewServer(handler.AppHandler(TestBootstrap))
 	TestBootstrap.APIPath = apiPath
 	TestBootstrap.APIVersion = apiVersion
 	TestBootstrap.APIServerURL = fmt.Sprintf("%s/%s/%s", TestBootstrap.ServerInstance.URL, TestBootstrap.APIPath, TestBootstrap.APIVersion)

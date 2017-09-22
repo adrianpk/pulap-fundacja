@@ -1,0 +1,104 @@
+${define "head"}
+${$user := .Model}
+<title>Edit ${$user.Username.String}</title>
+${end}
+
+${define "body"}
+${$user := .Model}
+<div class="container">
+  <div class="mt-3">
+    <h1>Edit <span id="heading-sufix">${$user.Username.String}<span></h1>
+  </div>
+
+  <div>
+    <p>
+			<a href="/users" >Users</a>
+		</p>
+    <form id="update-form" class="form-vertical" role="form" action="/users/${$user.ID.String}" method="post" >
+      <fieldset>
+        <div class="form-group">
+          <span>
+            <label for="username">Username</label>
+            <small id="username-error" class="text-danger container-error"></small>
+          </span>
+          <input id="username" type="text" class="form-control fnd-form-control" name="username" value="${$user.Username.String}" placeholder="">
+        </div>
+
+        <div class="form-group">
+          <span>
+            <label for="email">Email</label>
+            <small id="emailError" class="text-danger container-error"></small>
+          </span>
+          <input id="email" type="email" class="form-control fnd-form-control" name="email" value="${$user.Email.String}">
+        </div>
+
+        <div class="form-group">
+          <span>
+            <label for="first-name">First Name</label>
+            <small id="first-name-error" class="text-danger container-error"></small>
+          </span>
+          <input id="first-name" type="text" class="form-control fnd-form-control" name="first-name" value="${$user.FirstName.String}">
+        </div>
+
+        <div class="form-group">
+          <span>
+            <label for="middle-names">Middle Names</label>
+            <small id="middle-names-error" class="text-danger container-error"></small>
+          </span>
+          <input id="middle-names" type="text" class="form-control fnd-form-control" name="middle-names" value="${$user.MiddleNames.String}">
+        </div>
+
+        <div class="form-group">
+          <span>
+            <label for="last-name">Last Name</label>
+            <small id="last-name-error" class="text-danger container-error"></small>
+          </span>
+          <input id="last-name" type="text" class="form-control fnd-form-control"  name="last-name" value="${$user.LastName.String}">
+        </div>
+
+        <div class="form-group">
+          <label class="fnd-checkbox">
+              <input id="is-active" type="checkbox" id="is-active" name="is-active" class="form-control" value="true" ${if $user.IsActive.Bool}checked${end}>
+              <span>Active</span>
+          </label>
+        </div>
+      </fieldset>
+      <p><input type="submit" class="btn btn-xs btn-outline-primary" id="submit" value="Update"></p>
+    </form>
+
+    <!-- If javascript is enabled show a modal confirmation overlay -->
+    <!-- If javascript is disabled redirect to a confirmation page -->
+    <div>
+      <form id="delete-form" action="/users/init-delete/${$user.ID.String}" method="post" class="form-wizard">
+        <button type="submit" class="btn btn-xs btn-outline-danger">
+          Delete
+        </button>
+      </form>
+    </div>
+
+    <!-- Delete confirm modal -->
+    <div id="delete-confirm-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h3 id="myModalLabel">Delete User</h3>
+          </div>
+          <div class="modal-body">
+              <p>Confirm?</p>
+          </div>
+          <div class="modal-footer">
+              <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+              <form action="/users/delete/${$user.ID.String}" method="post" class="form-wizard">
+                <button type="submit" class="btn btn-xs btn-danger";>
+                  Delete
+                </button>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+${end}

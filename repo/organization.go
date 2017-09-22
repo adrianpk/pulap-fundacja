@@ -59,7 +59,7 @@ func (repo *OrganizationRepository) Create(organization *models.Organization) er
 	organization.SetID()
 	organization.SetCreationValues()
 	tx := repo.DB.MustBegin()
-	organizationInsertSQL := "INSERT INTO organizations (id, name, description, geolocation, started_at, created_by, is_active, is_logical_deleted, created_at, updated_at) VALUES (:id, :name, :description, :geolocation, :started_at, :created_by, :is_active, :is_logical_deleted, :created_at, :updated_at)"
+	organizationInsertSQL := "INSERT INTO organizations (id, name, description, user_username, user_id, geolocation, started_at, created_by, is_active, is_logical_deleted, created_at, updated_at) VALUES (:id, :name, :description, :user_username, :user_id, :geolocation, :started_at, :created_by, :is_active, :is_logical_deleted, :created_at, :updated_at)"
 	_, err := tx.NamedExec(organizationInsertSQL, organization)
 	if err != nil {
 		return err
