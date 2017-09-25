@@ -27,8 +27,8 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/adrianpk/fundacja/logger"
-	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/pulap/logger"
+	"github.com/adrianpk/pulap/models"
 	"github.com/gorilla/sessions"
 )
 

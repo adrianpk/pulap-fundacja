@@ -27,15 +27,20 @@ import (
 	// Only for the page initialization side effects.
 	"net/http"
 
-	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/routers"
+	"github.com/adrianpk/pulap/bootstrap"
+	"github.com/adrianpk/pulap/routers"
+	"github.com/rs/cors"
 
 	"github.com/codegangsta/negroni"
 )
 
 // AppHandler - Retrive App handler.
 func AppHandler(config bootstrap.Configuration) http.Handler {
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:3000", "http://127.0.0.1:3000"},
+	})
 	n := negroni.Classic()
+	n.Use(c)
 	n.UseHandler(routers.GetRouter(config))
 	return n
 }

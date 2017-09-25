@@ -29,11 +29,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/adrianpk/fundacja/app"
-	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/logger"
-	"github.com/adrianpk/fundacja/models"
-	"github.com/adrianpk/fundacja/repo"
+	"github.com/adrianpk/pulap/app"
+	"github.com/adrianpk/pulap/bootstrap"
+	"github.com/adrianpk/pulap/logger"
+	"github.com/adrianpk/pulap/models"
+	"github.com/adrianpk/pulap/repo"
 
 	"github.com/twinj/uuid"
 )

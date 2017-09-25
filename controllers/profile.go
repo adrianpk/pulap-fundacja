@@ -27,10 +27,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/adrianpk/fundacja/app"
-	"github.com/adrianpk/fundacja/logger"
-	"github.com/adrianpk/fundacja/models"
-	"github.com/adrianpk/fundacja/repo"
+	"github.com/adrianpk/pulap/app"
+	"github.com/adrianpk/pulap/logger"
+	"github.com/adrianpk/pulap/models"
+	"github.com/adrianpk/pulap/repo"
 
 	"github.com/gorilla/mux"
 )

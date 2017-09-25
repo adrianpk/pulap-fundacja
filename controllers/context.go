@@ -24,7 +24,7 @@
 package controllers
 
 import (
-	"github.com/adrianpk/fundacja/bootstrap"
+	"github.com/adrianpk/pulap/bootstrap"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

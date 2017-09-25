@@ -27,8 +27,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/adrianpk/fundacja/db"
-	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/pulap/db"
+	"github.com/adrianpk/pulap/models"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Import pq without side effects
 )

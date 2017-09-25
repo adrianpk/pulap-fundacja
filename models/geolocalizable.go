@@ -23,7 +23,7 @@
 
 package models
 
-import "github.com/adrianpk/fundacja/types"
+import "github.com/adrianpk/pulap/types"
 
 // GeolocalizableModel - Common properties for auditable models.
 type GeolocalizableModel struct {

@@ -27,8 +27,9 @@ package app
 import (
 	"encoding/json"
 	"errors"
-	"github.com/adrianpk/fundacja/logger"
 	"net/http"
+
+	"github.com/adrianpk/pulap/logger"
 )
 
 const exposeSourceError = true

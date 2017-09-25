@@ -27,7 +27,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/adrianpk/fundacja/logger"
+	"github.com/adrianpk/pulap/logger"
 	"github.com/markbates/pop/nulls"
 	"golang.org/x/crypto/bcrypt"
 )

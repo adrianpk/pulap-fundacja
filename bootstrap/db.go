@@ -27,8 +27,8 @@ package bootstrap
 import (
 	"path"
 
-	"github.com/adrianpk/fundacja/db"
-	"github.com/adrianpk/fundacja/logger"
+	"github.com/adrianpk/pulap/db"
+	"github.com/adrianpk/pulap/logger"
 )
 
 const (

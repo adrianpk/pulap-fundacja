@@ -27,8 +27,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/logger"
+	"github.com/adrianpk/pulap/bootstrap"
+	"github.com/adrianpk/pulap/logger"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 )
@@ -112,7 +112,7 @@ func InitSubRouters() {
 // InitPublicFilesystem - Initialize public filesystem.
 func InitPublicFilesystem(publicDir string) {
 	// Paths
-	//publicFsPath := "/Users/adrian/go/src/github.com/adrianpk/fundacja/resources/public"
+	//publicFsPath := "/Users/adrian/go/src/github.com/adrianpk/pulap/resources/public"
 	publicPath := "/{rest:.*}"
 	// Fileserver
 	fsServer := http.FileServer(http.Dir(publicDir))
@@ -125,7 +125,7 @@ func InitPublicFilesystem(publicDir string) {
 // InitPublicFilesystems - Initialize public filesystem.
 func InitPublicFilesystems(publicDir string) {
 	// Paths
-	//fsPath := "/Users/adrian/go/src/github.com/adrianpk/fundacja/resources/public"
+	//fsPath := "/Users/adrian/go/src/github.com/adrianpk/pulap/resources/public"
 	publicPath := "/"
 	// Fileserver
 	fsServer := http.FileServer(http.Dir(publicDir))

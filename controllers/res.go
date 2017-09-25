@@ -24,7 +24,7 @@
 package controllers
 
 import (
-	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/pulap/models"
 )
 
 type (

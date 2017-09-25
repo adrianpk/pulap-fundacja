@@ -27,7 +27,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/pulap/models"
 )
 
 // UserChanges - Creates a map ([string]interface{}) including al changing field.

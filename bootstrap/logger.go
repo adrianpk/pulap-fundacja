@@ -27,7 +27,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/adrianpk/fundacja/logger"
+	"github.com/adrianpk/pulap/logger"
 )
 
 // SetLogLevel sets the logging level preference

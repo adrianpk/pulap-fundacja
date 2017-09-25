@@ -28,11 +28,11 @@ import (
 	//httpcontext "github.com/gorilla/context"
 	//"github.com/jmoiron/sqlx"
 
-	"github.com/adrianpk/fundacja/logger"
+	"github.com/adrianpk/pulap/logger"
 
 	_ "github.com/lib/pq" // Import pq without side effects
 
-	"github.com/adrianpk/fundacja/repo"
+	"github.com/adrianpk/pulap/repo"
 )
 
 // IsAllowed - Returns true if user has at leeast one enabling permission over some resource.

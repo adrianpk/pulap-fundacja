@@ -31,10 +31,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/controllers"
-	"github.com/adrianpk/fundacja/handler"
-	"github.com/adrianpk/fundacja/logger"
+	"github.com/adrianpk/pulap/bootstrap"
+	"github.com/adrianpk/pulap/controllers"
+	"github.com/adrianpk/pulap/handler"
+	"github.com/adrianpk/pulap/logger"
 )
 
 func main() {
@@ -58,7 +58,7 @@ func main() {
 func mockBootParameters() map[string]string {
 	params := make(map[string]string)
 	params["env"] = "test"
-	params["app_home"] = os.Getenv("FUNDACJA_HOME")
+	params["app_home"] = os.Getenv("PULAP_HOME")
 	params["migration"] = "n"
 	return params
 }

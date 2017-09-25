@@ -24,7 +24,7 @@
 package routers
 
 import (
-	"github.com/adrianpk/fundacja/controllers"
+	"github.com/adrianpk/pulap/controllers"
 	"github.com/codegangsta/negroni"
 
 	"github.com/gorilla/mux"

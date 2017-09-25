@@ -30,10 +30,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/db"
-	"github.com/adrianpk/fundacja/logger"
-	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/pulap/bootstrap"
+	"github.com/adrianpk/pulap/db"
+	"github.com/adrianpk/pulap/logger"
+	"github.com/adrianpk/pulap/models"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Import pq without side effects
 )

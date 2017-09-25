@@ -28,13 +28,13 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/adrianpk/fundacja/app"
-	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/pulap/app"
+	"github.com/adrianpk/pulap/models"
 	"net/http"
 
 	_ "github.com/lib/pq" // Import pq without side effects
 
-	"github.com/adrianpk/fundacja/repo"
+	"github.com/adrianpk/pulap/repo"
 )
 
 // GetPropertiesSets - Returns a collection containing all properties from some owner.

@@ -32,11 +32,11 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/adrianpk/fundacja/app"
-	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/logger"
-	"github.com/adrianpk/fundacja/models"
-	"github.com/adrianpk/fundacja/repo"
+	"github.com/adrianpk/pulap/app"
+	"github.com/adrianpk/pulap/bootstrap"
+	"github.com/adrianpk/pulap/logger"
+	"github.com/adrianpk/pulap/models"
+	"github.com/adrianpk/pulap/repo"
 
 	_ "github.com/lib/pq" // Import pq without side effects
 )
@@ -61,6 +61,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	var res UserResource
 	err := json.NewDecoder(r.Body).Decode(&res)
 	if err != nil {
+		debugRequest(r)
 		app.ShowError(w, app.ErrRequestParsing, err, http.StatusInternalServerError)
 		return
 	}

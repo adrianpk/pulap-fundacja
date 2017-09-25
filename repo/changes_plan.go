@@ -23,7 +23,7 @@
 
 package repo
 
-import "github.com/adrianpk/fundacja/models"
+import "github.com/adrianpk/pulap/models"
 
 // PlanSubscriptionChanges - Creates a map ([string]interface{}) including al changing field.
 func PlanSubscriptionChanges(planSubscription *models.PlanSubscription, reference models.PlanSubscription) map[string]string {

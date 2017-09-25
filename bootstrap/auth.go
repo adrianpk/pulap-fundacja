@@ -35,7 +35,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/adrianpk/fundacja/app"
+	"github.com/adrianpk/pulap/app"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
@@ -65,9 +65,9 @@ type AppClaims struct {
 // location of private/public key files
 const (
 	// openssl genrsa -out app.rsa 1024
-	privKeyPath = "resources/keys/fundacja.rsa"
+	privKeyPath = "resources/keys/pulap.rsa"
 	// openssl rsa -in app.rsa -pubout > app.rsa.pub
-	pubKeyPath = "resources/keys/fundacja.rsa.pub"
+	pubKeyPath = "resources/keys/pulap.rsa.pub"
 )
 
 // Private key for signing and public key for verification

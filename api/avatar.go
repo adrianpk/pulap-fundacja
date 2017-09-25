@@ -36,9 +36,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/adrianpk/fundacja/app"
-	"github.com/adrianpk/fundacja/models"
-	"github.com/adrianpk/fundacja/repo"
+	"github.com/adrianpk/pulap/app"
+	"github.com/adrianpk/pulap/models"
+	"github.com/adrianpk/pulap/repo"
 )
 
 const (

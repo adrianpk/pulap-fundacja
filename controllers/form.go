@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/adrianpk/fundacja/logger"
+	"github.com/adrianpk/pulap/logger"
 	"github.com/gorilla/schema"
 )
 

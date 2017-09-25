@@ -23,7 +23,7 @@
 
 package repo
 
-import "github.com/adrianpk/fundacja/models"
+import "github.com/adrianpk/pulap/models"
 
 // PropertiesSetChanges - Creates a map ([string]interface{}) including al changing field.
 func PropertiesSetChanges(propertiesSet *models.PropertiesSet, reference models.PropertiesSet) map[string]string {

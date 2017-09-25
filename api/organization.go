@@ -32,13 +32,13 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/adrianpk/fundacja/app"
-	"github.com/adrianpk/fundacja/logger"
-	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/pulap/app"
+	"github.com/adrianpk/pulap/logger"
+	"github.com/adrianpk/pulap/models"
 
 	_ "github.com/lib/pq" // Import pq without side effects
 
-	"github.com/adrianpk/fundacja/repo"
+	"github.com/adrianpk/pulap/repo"
 )
 
 // GetOrganizations - Returns a collection containing all organizations.

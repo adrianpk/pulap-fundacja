@@ -24,7 +24,7 @@
 package api
 
 import (
-	"github.com/adrianpk/fundacja/models"
+	"github.com/adrianpk/pulap/models"
 )
 
 type (

@@ -24,7 +24,7 @@
 package models
 
 import (
-	"github.com/adrianpk/fundacja/types"
+	"github.com/adrianpk/pulap/types"
 
 	sqlxtypes "github.com/jmoiron/sqlx/types"
 	"github.com/markbates/pop/nulls"

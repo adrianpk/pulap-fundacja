@@ -35,8 +35,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/adrianpk/fundacja/bootstrap"
-	"github.com/adrianpk/fundacja/handler"
+	"github.com/adrianpk/pulap/bootstrap"
+	"github.com/adrianpk/pulap/handler"
 
 	testfixtures "gopkg.in/testfixtures.v2"
 )
@@ -58,7 +58,7 @@ func BootParameters() map[string]string {
 	// Envs: "dev", "test", "prod"
 	// Migrations: "m", "r", "n" - migrate, rollback, none
 	params["env"] = "test"
-	params["app_home"] = os.Getenv("FUNDACJA_HOME")
+	params["app_home"] = os.Getenv("PULAP_HOME")
 	params["migration"] = "m"
 	return params
 }
