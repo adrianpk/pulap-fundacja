@@ -78,7 +78,7 @@ func (repo *UserRepository) Create(user *models.User) error {
 // Login - Retrive a User if username/email and provided
 func (repo *UserRepository) Login(user models.User) (models.User, error) {
 	u := models.User{}
-	logger.Debugf("User / Password: %s / %s", user.Username.String, user.Email.String)
+	logger.Debugf("User / Email: %s / %s", user.Username.String, user.Email.String)
 	err := repo.DB.Get(&u, "SELECT * FROM users WHERE username = $1 OR email=$2 LIMIT 1", user.Username, user.Email)
 	if err != nil {
 		logger.Debugf("Error 1: %s", err)
