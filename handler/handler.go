@@ -38,7 +38,8 @@ import (
 func AppHandler(config bootstrap.Configuration) http.Handler {
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:3000", "http://127.0.0.1:3000"},
-	})
+		AllowedMethods: []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Origin", "Content-Type", "X-Auth-Token", "Access-Control-Allow-Origin", "X-Requested-With", "Access-Control-Expose-Headers", "Authorization"}})
 	n := negroni.Classic()
 	n.Use(c)
 	n.UseHandler(routers.GetRouter(config))
